@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10232B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kaddach">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{color-scheme:light}body{margin:0}</style>
+<title>Kaddach Fatoura</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Cairo:wght@400;600;700&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  /* Concept: the utility meter is the interface. Porcelain dial plates, black counting drums
+     you can spin, a staircase that shows the tranche you are standing on, and a bill that
+     rolls like an odometer. Each utility lends its own signal color. */
+  --bg:#E3E9E7; --plate:#F4F7F5; --plate2:#E9EFEC; --ink:#10232B; --muted:#4F636A; --line:#C2CECB;
+  --drum:#0F1B21; --drum-ink:#F2F6F3; --dec:#B33A25;
+  --panel:#0F1B21; --panel-ink:#EAF1EE; --panel-muted:#9FB2B8;
+  --elec:#E0A100; --gaz:#E2562B; --eau:#1A86C9;
+  --accent:var(--elec); --on-accent:#10232B; --focus:#1A86C9;
+  --warn:#9A4A00; --ok:#1B6E46;
+  --shadow:0 1px 0 rgba(255,255,255,.65) inset,0 12px 28px -16px rgba(16,35,43,.45);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1317; --plate:#141F25; --plate2:#1B2A32; --ink:#E6EEEB; --muted:#9AAEB4; --line:#2A3B43;
+    --drum:#040809; --elec:#F2B21A; --gaz:#FF7B4F; --eau:#52B6F2; --focus:#52B6F2;
+    --warn:#F0A04B; --ok:#58C48C;
+    --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -16px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1317; --plate:#141F25; --plate2:#1B2A32; --ink:#E6EEEB; --muted:#9AAEB4; --line:#2A3B43;
+  --drum:#040809; --elec:#F2B21A; --gaz:#FF7B4F; --eau:#52B6F2; --focus:#52B6F2;
+  --warn:#F0A04B; --ok:#58C48C;
+  --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -16px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:15px/1.5 'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  padding-block:20px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.app{max-width:1080px;margin:0 auto;--dw:clamp(30px,9.4vw,46px);--dh:clamp(46px,13vw,64px)}
+.app[lang="ar"]{font-family:'Cairo','Schibsted Grotesk',system-ui,sans-serif}
+.app[data-util="elec"]{--accent:var(--elec)}
+.app[data-util="gaz"]{--accent:var(--gaz)}
+.app[data-util="eau"]{--accent:var(--eau)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.brand-name{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:clamp(34px,7vw,52px);line-height:.95;letter-spacing:.02em;text-transform:uppercase}
+.brand-tag{color:var(--muted);margin-top:6px;max-width:46ch;text-wrap:balance}
+.lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--plate)}
+.lang button{font:inherit;font-weight:600;border:0;background:transparent;color:var(--muted);padding:7px 14px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.demo{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;background:var(--plate2);border:1px dashed var(--line);border-radius:8px;padding:9px 12px;margin-bottom:14px;color:var(--muted)}
+.demo button{font:inherit;font-weight:600;color:var(--ink);background:transparent;border:0;text-decoration:underline;cursor:pointer;padding:0}
+
+/* utility selector */
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.tab{font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;padding:13px 8px;border:1px solid var(--line);border-radius:10px;background:var(--plate);color:var(--ink);cursor:pointer;min-width:0}
+.tab svg{width:20px;height:20px;flex:none;fill:currentColor}
+.tab[aria-selected="true"]{border-color:transparent;color:var(--on-accent)}
+.tab[data-u="elec"][aria-selected="true"]{background:var(--elec)}
+.tab[data-u="gaz"][aria-selected="true"]{background:var(--gaz)}
+.tab[data-u="eau"][aria-selected="true"]{background:var(--eau)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+.plate,.card{background:var(--plate);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px;min-width:0}
+.plate-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.plate-title{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:24px;letter-spacing:.03em;text-transform:uppercase;line-height:1.1}
+.plate-hint{color:var(--muted);font-size:13px}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--plate2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+
+/* the counting drums */
+.drums{display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 12px;border-radius:10px;
+  background:linear-gradient(#1c2b32,#0a1216);box-shadow:inset 0 2px 8px rgba(0,0,0,.65),0 0 0 3px var(--line);direction:ltr}
+.dcol{display:flex;flex-direction:column;align-items:center;gap:3px}
+.nudge{width:100%;height:22px;border:0;background:transparent;color:#8498A0;cursor:pointer;display:grid;place-items:center;border-radius:5px;padding:0}
+.nudge:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nudge svg{width:14px;height:14px;fill:currentColor}
+.comma{color:#fff;font-weight:800;font-size:26px;align-self:center;padding:0 1px}
+.drum{position:relative;width:var(--dw);height:var(--dh);overflow:hidden;border-radius:5px;background:var(--drum);color:var(--drum-ink);
+  touch-action:none;cursor:ns-resize;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);user-select:none;-webkit-user-select:none}
+.drum::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 70%,rgba(0,0,0,.78))}
+.drum.dec{background:var(--dec);color:#fff}
+.strip{transform:translateY(calc(var(--d,0)*var(--dh)*-1));transition:transform .36s cubic-bezier(.2,.8,.2,1)}
+.strip.nt{transition:none}
+.cell{height:var(--dh);display:grid;place-items:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:calc(var(--dh)*.8);line-height:1;font-variant-numeric:tabular-nums}
+.meter-unit{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin:10px 2px 0;font-size:13px;color:var(--muted)}
+.meter-unit b{color:var(--ink);font-family:'Big Shoulders Display','Cairo',sans-serif;font-size:20px;letter-spacing:.04em}
+
+.fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:12px}
+@media (max-width:380px){.fields{grid-template-columns:minmax(0,1fr)}}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+.fld input{font:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--plate2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0;width:100%;font-variant-numeric:tabular-nums}
+.quick{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+.chip{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--plate2);color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer}
+.chip:hover{border-color:var(--ink)}
+.photo-row{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--plate);color:var(--ink);cursor:pointer}
+.btn svg{width:18px;height:18px;fill:currentColor;flex:none}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.thumb{position:relative;width:54px;height:54px;border-radius:8px;overflow:hidden;border:1px solid var(--line);padding:0;background:var(--plate2);cursor:zoom-in}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-x{position:absolute;top:2px;inset-inline-end:2px;width:18px;height:18px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:12px;line-height:1;cursor:pointer;padding:0}
+.thumb-box{position:relative;display:inline-block}
+
+/* readout: the bill rolls like an odometer */
+.readout{background:var(--panel);color:var(--panel-ink);border-radius:12px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.ro-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.ro-label{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--panel-muted)}
+.ro-pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--accent);color:var(--on-accent)}
+.ro-amount{display:flex;align-items:flex-end;gap:12px;margin:12px 0 10px;direction:ltr;flex-wrap:wrap}
+.odo{--dw:clamp(34px,11.2vw,62px);--dh:clamp(54px,17vw,92px);display:flex;gap:4px;padding:8px 10px;border-radius:10px;background:#000;box-shadow:inset 0 2px 8px rgba(0,0,0,.8),0 0 0 2px #2a3a42;direction:ltr}
+.odo .drum{background:#050a0c;box-shadow:none}
+.odo .drum.grp{margin-inline-end:8px}
+.odo .drum.lead{color:#3b4a51}
+.ro-cur{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:clamp(26px,6vw,38px);line-height:1;color:var(--accent);padding-bottom:6px}
+.ro-meta{color:var(--panel-ink);font-variant-numeric:tabular-nums}
+.ro-sub{color:var(--panel-muted);font-size:13px;margin-top:2px}
+.warn{margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(240,160,75,.14);color:#F7C58A;font-size:13px}
+.ro-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.readout .btn{background:transparent;border-color:#33464e;color:var(--panel-ink)}
+.readout .btn:hover{border-color:#8fa3aa}
+.readout .btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.flash{font-size:13px;color:var(--panel-muted);align-self:center}
+
+/* staircase */
+.card h2{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:22px;letter-spacing:.03em;text-transform:uppercase;line-height:1.1}
+.card .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.stair{display:block;width:100%;height:auto;margin-top:10px;direction:ltr}
+.stair text{font-family:'Schibsted Grotesk',system-ui,sans-serif}
+.s-bg{fill:var(--plate2);stroke:var(--line)}
+.s-fill{fill:var(--accent)}
+.s-price{font-size:12px;font-weight:700;fill:var(--ink);text-anchor:middle}
+.s-t{font-size:11px;font-weight:700;fill:var(--ink);text-anchor:middle}
+.s-lim{font-size:11px;fill:var(--muted);text-anchor:middle}
+.s-axis{stroke:var(--ink);stroke-width:1.5}
+.s-mark{stroke:var(--ink);stroke-width:2}
+.s-mtri{fill:var(--ink)}
+.s-mlbl{font-size:12px;font-weight:700;fill:var(--ink)}
+.tips{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.tips p{font-size:14px;padding-inline-start:12px;border-inline-start:3px solid var(--accent)}
+
+/* ticket */
+.ticket .row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dotted var(--line);align-items:baseline}
+.ticket .row small{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.ticket .row b{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ticket .row.total{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px;font-weight:800;font-size:17px}
+.ticket .row.total b{font-weight:800}
+.ticket .base{color:var(--muted);font-size:13px;margin:6px 0 4px}
+.ticket .rows{margin-top:6px}
+
+/* lower sections */
+.below{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:20px;align-items:start}
+@media (max-width:880px){.below{grid-template-columns:minmax(0,1fr)}}
+details.card>summary{cursor:pointer;list-style:none;font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:22px;letter-spacing:.03em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:"+";font-size:26px;line-height:1;color:var(--muted)}
+details.card[open]>summary::after{content:"\2212"}
+details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.hint{color:var(--muted);font-size:13px}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.hist li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dotted var(--line);flex-wrap:wrap}
+.hist .h-main{min-width:0}
+.hist .h-main b{font-variant-numeric:tabular-nums}
+.hist .h-main small{display:block;color:var(--muted);font-size:12px}
+.hist .h-act{display:flex;gap:6px;flex-wrap:wrap}
+.mini{font:inherit;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;border:1px solid var(--line);background:var(--plate2);color:var(--ink);cursor:pointer}
+.mini:hover{border-color:var(--ink)}
+.tr-grid{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center}
+@media (max-width:420px){.tr-grid{grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) minmax(0,.8fr)}}
+.tr-grid .hd{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tr-grid .tn{font-weight:700}
+.tr-grid input,.pgrid input{font:inherit;font-size:15px;color:var(--ink);background:var(--plate2);border:1px solid var(--line);border-radius:7px;padding:7px 8px;width:100%;min-width:0;font-variant-numeric:tabular-nums}
+.tr-grid input:disabled{color:var(--muted);background:transparent;border-style:dashed}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.src{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.src a{color:var(--ink)}
+.foot{margin-top:22px;color:var(--muted);font-size:13px;text-align:center}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:24px}
+.lightbox img{max-width:min(92vw,720px);max-height:82vh;border-radius:10px}
+@media (prefers-reduced-motion:reduce){.strip{transition:none}}
+</style>
+</head>
+<body>
+
+<div id="app" class="app" data-util="elec" lang="fr" dir="ltr">
+  <header class="top">
+    <div>
+      <h1 class="brand-name" id="tName"></h1>
+      <p class="brand-tag" id="tTag"></p>
+    </div>
+    <div class="lang" role="group" aria-label="Langue / اللغة">
+      <button type="button" data-lang="fr" aria-pressed="true">FR</button>
+      <button type="button" data-lang="ar" aria-pressed="false">عربي</button>
+    </div>
+  </header>
+
+  <div class="demo" id="demo" hidden><span id="demoTxt"></span><button type="button" id="demoBtn"></button></div>
+
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+
+  <main class="grid">
+    <section class="col">
+      <article class="plate" id="plateStart"></article>
+      <article class="plate" id="plateCur"></article>
+    </section>
+    <section class="col">
+      <article class="readout" id="readout">
+        <div class="ro-top"><span class="ro-label" id="roLabel"></span><span class="ro-pill" id="roPill"></span></div>
+        <div class="ro-amount"><div class="odo" id="odo"></div><span class="ro-cur" id="roCur"></span></div>
+        <p class="ro-meta" id="roMeta"></p>
+        <p class="ro-sub" id="roSub"></p>
+        <p class="warn" id="roWarn" hidden></p>
+        <div class="ro-actions">
+          <button type="button" class="btn primary" id="btnSave"></button>
+          <button type="button" class="btn" id="btnNew"></button>
+          <span class="flash" id="flash" role="status"></span>
+        </div>
+        <span class="sr" id="srAmount" aria-live="polite"></span>
+      </article>
+      <article class="card" id="stairCard">
+        <h2 id="stTitle"></h2>
+        <p class="sub" id="stSub"></p>
+        <div id="stairHost"></div>
+        <div class="tips" id="tips"></div>
+      </article>
+      <article class="card ticket" id="ticket"></article>
+    </section>
+  </main>
+
+  <section class="below">
+    <details class="card" id="calCard"></details>
+    <article class="card" id="histCard"></article>
+    <details class="card" id="barCard"></details>
+    <article class="card" id="srcCard"></article>
+  </section>
+  <p class="foot" id="disc"></p>
+</div>
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var DAYQ=91.25, KEY='kaddach.v1', UTILS=['elec','gaz','eau'];
+
+/* ---------- helpers ---------- */
+function ISO(d){var z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
+function today(){return ISO(new Date())}
+function addDays(iso,n){var d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return ISO(d)}
+function daysBetween(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5)}
+function nf(v,d){d=d==null?2:d;return Number(v).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function num(v){var n=Number(String(v).replace(/\s/g,'').replace(',','.'));return isFinite(n)?n:NaN}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+
+/* ---------- tariffs (per quarter, household) ---------- */
+var DEF={
+  elec:{tr:[{lim:125,price:1.7787,tva:9},{lim:250,price:4.1789,tva:9},{lim:1000,price:4.8120,tva:19},{lim:null,price:5.4798,tva:19}],
+        fixed:{power:6,perKwMonth:4.16,tvaFixed:9},other:0},
+  gaz:{coef:9.25,tr:[{lim:1125,price:0.1682,tva:9},{lim:2500,price:0.3245,tva:9},{lim:7500,price:0.4025,tva:19},{lim:null,price:0.4600,tva:19}],
+        fixed:{perMonth:28.5,tvaFixed:9},other:0},
+  eau:{tr:[{lim:25,price:6.30,tva:9},{lim:55,price:20.48,tva:9},{lim:82,price:34.65,tva:9},{lim:null,price:40.95,tva:9}],
+        fixed:{perMonth:0,tvaFixed:9},sanit:0,other:0}
+};
+var BU={elec:'kWh',gaz:'th',eau:'m³'};      // billing unit
+var MU={elec:'kWh',gaz:'m³',eau:'m³'};      // unit read on the meter
+var MET={elec:{n:6,d:0},gaz:{n:5,d:1},eau:{n:5,d:1}};
+var ICON={
+  elec:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4.5 14h6l-1 8 9-12h-6z"/></svg>',
+  gaz:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.8 3.6 5 5.4 5 10a5 5 0 0 1-10 0c0-2 .9-3.3 2-4.4 0 1.9.9 3 2 3-.8-2.9-.4-5.700 1-8.600z"/></svg>',
+  eau:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.500s6.500 7 6.500 11.700a6.500 6.500 0 0 1-13 0C5.500 9.500 12 2.500 12 2.500z"/></svg>'
+};
+var CAM='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 7.500 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.500L15 3H9zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>';
+var UP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7 4.500 15h15z"/></svg>';
+var DN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17 4.500 9h15z"/></svg>';
+
+/* ---------- texts ---------- */
+var I={
+fr:{name:'Kaddach Fatoura',tag:"Reporte l'index de ton compteur et vois ta facture avant qu'elle arrive.",
+ tab_elec:'Électricité',tab_gaz:'Gaz',tab_eau:'Eau',da:'DA',
+ pStart:'Ancien index',hStart:'Celui imprimé sur ta dernière facture',pCur:'Index actuel',hCur:'Ce que ton compteur affiche maintenant',
+ drumHelp:'Tourne les rouleaux (glisse, molette, flèches) ou tape le nombre.',typeIdx:'Index',dateOn:'Relevé du',ago:'Il y a',m1:'1 mois',m2:'2 mois',m3:'3 mois',
+ photo:'Photo du compteur',photoDel:'Retirer la photo',example:'Exemple',demo:"Valeurs d'exemple pour te montrer comment ça marche.",demoBtn:'Partir de mes index',
+ roLabel:'Facture estimée du trimestre',tranche:'Tranche {0}',metaA:'{0} {1} en {2} jours · {3} {1} par jour',metaG:'{0} m³ (≈ {1} th) en {2} jours · {3} th par jour',
+ soFar:"Déjà consommé jusqu'à aujourd'hui : {0} DA",warnNeg:"L'index actuel est plus petit que l'ancien. Vérifie les chiffres ou une remise à zéro du compteur.",warnDays:'Choisis deux dates différentes pour estimer ta consommation.',
+ save:'Enregistrer ce relevé',saved:'Relevé enregistré',newBill:'Nouvelle facture reçue : repartir de cet index',newDone:'Nouveau point de départ enregistré',
+ stTitle:'Où tu te situes dans le barème',stSub:"Chaque marche est une tranche : plus tu consommes, plus le prix de l'unité monte.",mark:'{0} {1} par trimestre',
+ tipIn:'À ce rythme tu finis le trimestre en tranche {0} ({1} DA le {2}).',tipMargin:'Marge avant la tranche {0} (+{1} %) : {2} {3}.',tipLast:'Tu es dans la dernière tranche, la plus chère.',
+ tipSave:'Revenir à {0} {1} par trimestre te ferait économiser environ {2} DA.',
+ tkTitle:"Détail de l'estimation",tkBase:'Base : {0} {1} par trimestre',tkTr:'Tranche {0}',tkPrime:'Prime fixe (puissance {0} kW)',tkRedGaz:'Redevance fixe',tkDroit:'Droit fixe (art. 485 bis)',
+ tkFixeEau:'Frais fixes',tkSanit:'Assainissement ({0} %)',tkOther:'Autres frais',tkHT:'Sous-total HT',tkTVA:'TVA',tkTotal:'Total estimé',tkCal:'Réglage sur ta facture (× {0})',
+ histTitle:'Mes relevés',histEmpty:'Aucun relevé enregistré pour le moment.',histUse:'Prendre comme ancien index',histDel:'Supprimer',histDelta:'+{0} {1} depuis le relevé précédent',
+ calTitle:'Régler sur ma vraie facture',calHelp:"Entre la consommation et le montant de ta dernière facture : l'estimation s'ajuste à tes taxes réelles.",calCons:'Consommation facturée ({0})',calPaid:'Montant payé (DA)',
+ calApply:'Régler',calClear:'Retirer le réglage',calHigh:'plus haute',calLow:'plus basse',calRes:"Ta facture réelle était {0} % {1} que l'estimation. L'écart est maintenant corrigé.",calErr:'Entre deux nombres positifs.',calOn:'Réglage actif : × {0}',
+ bTitle:'Barème et réglages',bNote:"Prix par tranche : décision CREG de 2005 et hausses de 2016. TVA, droit fixe, redevances et coefficient du gaz : valeurs usuelles à vérifier sur ta facture.",
+ bUpTo:"Jusqu'à",bPrice:'Prix DA/{0}',bTva:'TVA %',bLast:'au-delà',bTr:'Tranche {0}',
+ bPower:'Puissance souscrite (kW)',bPerKw:'Prime par kW et par mois (DA)',bTvaFixed:'TVA sur frais fixes (%)',bCoef:'Thermies par m³',bPerMonth:'Redevance fixe par mois (DA)',bFixeEau:'Frais fixes par mois (DA)',
+ bSanit:"Assainissement (% du montant de l'eau)",bOther:'Autres frais par trimestre (DA)',bReset:"Rétablir le barème d'origine",
+ srcTitle:'Sources',disc:'Estimation indicative, ce n\'est pas une facture. Tes relevés restent sur ton appareil.',
+ s_creg:'Décision CREG D/06-05 (2005) : prix des tranches 1 et 2, seuils du gaz',s_echo:'Echorouk : hausses des tranches 3 et 4 (2016)',s_a360:'Algérie360 : seuils des tranches et hausses de 2016',
+ s_485:'Algérie360 : droit fixe de l\'article 485 bis',s_iwra:'IWRA : tarif de l\'eau potable des ménages (décret de 2005)'},
+ar:{name:'قداش الفاتورة',tag:'أدخل مؤشر عدّادك وشاهد فاتورتك قبل أن تصل.',
+ tab_elec:'الكهرباء',tab_gaz:'الغاز',tab_eau:'الماء',da:'دج',
+ pStart:'المؤشر القديم',hStart:'المكتوب في آخر فاتورة',pCur:'المؤشر الحالي',hCur:'ما يعرضه العدّاد الآن',
+ drumHelp:'حرّك الأسطوانات (سحب، عجلة، أسهم) أو اكتب الرقم.',typeIdx:'المؤشر',dateOn:'تاريخ القراءة',ago:'منذ',m1:'شهر',m2:'شهرين',m3:'3 أشهر',
+ photo:'صورة العدّاد',photoDel:'حذف الصورة',example:'مثال',demo:'هذه قيم تجريبية لتوضيح طريقة العمل.',demoBtn:'ابدأ بمؤشراتي',
+ roLabel:'الفاتورة المقدّرة لثلاثة أشهر',tranche:'الشريحة {0}',metaA:'{0} {1} خلال {2} يوم · {3} {1} في اليوم',metaG:'{0} م³ (≈ {1} ث) خلال {2} يوم · {3} ث في اليوم',
+ soFar:'المستهلك إلى اليوم: {0} دج',warnNeg:'المؤشر الحالي أصغر من القديم. راجع الأرقام أو إعادة ضبط العدّاد.',warnDays:'اختر تاريخين مختلفين لتقدير الاستهلاك.',
+ save:'سجّل هذه القراءة',saved:'تم تسجيل القراءة',newBill:'وصلتني فاتورة جديدة: ابدأ من هذا المؤشر',newDone:'تم تسجيل نقطة البداية الجديدة',
+ stTitle:'موقعك في سلّم التعريفة',stSub:'كل درجة شريحة: كلما استهلكت أكثر ارتفع سعر الوحدة.',mark:'{0} {1} في الثلاثي',
+ tipIn:'بهذه الوتيرة تنهي الثلاثي في الشريحة {0} ({1} دج لكل {2}).',tipMargin:'هامش قبل الشريحة {0} (+{1} %): {2} {3}.',tipLast:'أنت في آخر شريحة، وهي الأغلى.',
+ tipSave:'النزول إلى {0} {1} في الثلاثي يوفّر حوالي {2} دج.',
+ tkTitle:'تفاصيل التقدير',tkBase:'الأساس: {0} {1} في الثلاثي',tkTr:'الشريحة {0}',tkPrime:'الحق الثابت للقدرة ({0} كيلواط)',tkRedGaz:'الإتاوة الثابتة',tkDroit:'الحق الثابت (المادة 485 مكرر)',
+ tkFixeEau:'مصاريف ثابتة',tkSanit:'التطهير ({0} %)',tkOther:'مصاريف أخرى',tkHT:'المجموع دون رسم',tkTVA:'الرسم على القيمة المضافة',tkTotal:'المجموع المقدّر',tkCal:'الضبط على فاتورتك (× {0})',
+ histTitle:'قراءاتي',histEmpty:'لا توجد قراءات مسجّلة بعد.',histUse:'اعتمده كمؤشر قديم',histDel:'حذف',histDelta:'+{0} {1} منذ القراءة السابقة',
+ calTitle:'اضبط على فاتورتي الحقيقية',calHelp:'أدخل استهلاك ومبلغ آخر فاتورة لك، فيُعدَّل التقدير حسب رسومك الفعلية.',calCons:'الاستهلاك المفوتر ({0})',calPaid:'المبلغ المدفوع (دج)',
+ calApply:'اضبط',calClear:'إلغاء الضبط',calHigh:'أعلى',calLow:'أقل',calRes:'فاتورتك الحقيقية كانت {0} % {1} من التقدير، وقد تم تصحيح الفارق.',calErr:'أدخل رقمين موجبين.',calOn:'الضبط مفعّل: × {0}',
+ bTitle:'التعريفة والإعدادات',bNote:'أسعار الشرائح: قرار لجنة الضبط 2005 وزيادات 2016. أما الرسم على القيمة المضافة والحق الثابت والإتاوات ومعامل الغاز فهي قيم معتادة، تحقّق منها في فاتورتك.',
+ bUpTo:'إلى حدّ',bPrice:'السعر دج/{0}',bTva:'رسم %',bLast:'ما فوق',bTr:'الشريحة {0}',
+ bPower:'القدرة المشترك بها (كيلواط)',bPerKw:'الحق لكل كيلواط شهريا (دج)',bTvaFixed:'الرسم على المصاريف الثابتة (%)',bCoef:'ث حرارية لكل م³',bPerMonth:'الإتاوة الثابتة شهريا (دج)',bFixeEau:'مصاريف ثابتة شهريا (دج)',
+ bSanit:'التطهير (% من مبلغ الماء)',bOther:'مصاريف أخرى في الثلاثي (دج)',bReset:'استرجاع التعريفة الأصلية',
+ srcTitle:'المصادر',disc:'تقدير تقريبي وليس فاتورة. قراءاتك تبقى في جهازك.',
+ s_creg:'قرار لجنة الضبط D/06-05 (2005): أسعار الشريحتين 1 و2 وعتبات الغاز',s_echo:'الشروق: زيادات الشريحتين 3 و4 (2016)',s_a360:'الجزائر360: عتبات الشرائح وزيادات 2016',
+ s_485:'الجزائر360: الحق الثابت (المادة 485 مكرر)',s_iwra:'IWRA: تعريفة ماء الشرب للأسر (مرسوم 2005)'}
+};
+function t(k){var a=arguments,s=(I[S.lang]&&I[S.lang][k]);if(s==null)s=I.fr[k];if(s==null)return k;
+  return String(s).replace(/\{(\d)\}/g,function(_,i){var v=a[+i+1];return v==null?'':v})}
+
+/* ---------- state ---------- */
+function mk(a,b,sd,cd){return {start:{idx:a,date:sd},cur:{idx:b,date:cd},photo:{start:null,cur:null},hist:[],cal:null,p:null}}
+function seed(){var d=today(),s=addDays(d,-62);
+  return {v:1,lang:'fr',tab:'elec',demo:true,u:{elec:mk(48210,48385,s,d),gaz:mk(1820,1895.5,s,d),eau:mk(3210,3241.2,s,d)}}}
+function load(){var s=null;try{var r=localStorage.getItem(KEY);if(r)s=JSON.parse(r)}catch(e){}
+  if(!s||!s.u||!s.u.elec||!s.u.gaz||!s.u.eau)s=seed();
+  UTILS.forEach(function(u){s.u[u].cur.date=today();s.u[u].photo=s.u[u].photo||{start:null,cur:null};s.u[u].hist=s.u[u].hist||[]});
+  if(!I[s.lang])s.lang='fr';return s}
+var S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){try{var c=clone(S);UTILS.forEach(function(u){c.u[u].photo={start:null,cur:null};c.u[u].hist.forEach(function(h){h.photo=null})});localStorage.setItem(KEY,JSON.stringify(c))}catch(e2){}}}
+function P(u){return S.u[u].p||DEF[u]}
+function editP(u){if(!S.u[u].p)S.u[u].p=clone(DEF[u]);return S.u[u].p}
+function touch(){if(S.demo){S.demo=false;$('#demo').hidden=true;$$('.demo-tag').forEach(function(e){e.hidden=true})}}
+
+/* ---------- billing engine ---------- */
+function levy(q){return q<70?0:q<=190?25:q<=390?100:200}
+function bill(u,U,q){
+  var o={lines:[],fx:[],ht:0,tva:0,total:0,idx:0},lo=0,found=false;
+  U.tr.forEach(function(tr,i){
+    var hi=tr.lim==null?Infinity:tr.lim,part=Math.max(0,Math.min(q,hi)-lo);
+    if(part>1e-9){var amt=part*tr.price;o.lines.push({i:i,q:part,price:tr.price,amt:amt,tva:tr.tva});o.ht+=amt;o.tva+=amt*tr.tva/100}
+    if(!found&&q<=hi){o.idx=i;found=true}
+    lo=hi});
+  var base=o.ht;
+  function fx(key,args,amt,tva){if(amt>0){o.fx.push({key:key,args:args,amt:amt});o.ht+=amt;o.tva+=amt*tva/100}}
+  if(u==='elec'){fx('tkPrime',[U.fixed.power],U.fixed.power*U.fixed.perKwMonth*3,U.fixed.tvaFixed);fx('tkDroit',[],levy(q),0)}
+  if(u==='gaz'){fx('tkRedGaz',[],U.fixed.perMonth*3,U.fixed.tvaFixed)}
+  if(u==='eau'){fx('tkFixeEau',[],U.fixed.perMonth*3,U.fixed.tvaFixed);fx('tkSanit',[U.sanit],base*U.sanit/100,0)}
+  fx('tkOther',[],U.other,0);
+  o.total=o.ht+o.tva;return o}
+function limits(U){var los=[],his=[],lo=0;U.tr.forEach(function(tr,i){var hi=tr.lim==null?(i>0?lo+(lo-los[i-1]):lo||1):tr.lim;los.push(lo);his.push(hi);lo=hi});return {los:los,his:his}}
+
+/* ---------- drums ---------- */
+function buildDrum(cls){var drum=document.createElement('div');drum.className='drum '+(cls||'');var strip=document.createElement('div');strip.className='strip';
+  for(var d=0;d<=10;d++){var c=document.createElement('div');c.className='cell';c.textContent=String(d%10);strip.appendChild(c)}
+  drum.appendChild(strip);return {drum:drum,strip:strip}}
+function snap(s,d){s.classList.add('nt');s.style.setProperty('--d',d);s._d=d;void s.offsetWidth;s.classList.remove('nt')}
+function roll(s,od,nd,fw,bw,animate){
+  clearTimeout(s._t);
+  if(!animate||s._d===undefined){snap(s,nd);return}
+  if(s._d===10)snap(s,0);
+  if(fw&&od===9&&nd===0){s._d=10;s.style.setProperty('--d',10);s._t=setTimeout(function(){snap(s,0)},430);return}
+  if(bw&&od===0&&nd===9){snap(s,10);s._d=9;s.style.setProperty('--d',9);return}
+  s._d=nd;s.style.setProperty('--d',nd)}
+
+function Odo(host,n){
+  host.innerHTML='';var ss=[],ds=[],T=null;
+  for(var i=0;i<n;i++){var b=buildDrum('odo-d'+(((n-1-i)%3===0&&i<n-1)?' grp':''));host.appendChild(b.drum);ss.push(b.strip);ds.push(b.drum)}
+  return {set:function(v){v=clamp(Math.round(v),0,Math.pow(10,n)-1);var old=T===null?v:T;
+    ss.forEach(function(s,i){var w=Math.pow(10,n-1-i),nd=Math.floor(v/w)%10,od=Math.floor(old/w)%10;roll(s,od,nd,v>old,v<old,T!==null);ds[i].classList.toggle('lead',v<w&&i<n-1)});T=v}}}
+
+function Meter(host,nInt,nDec,onChange,label){
+  host.innerHTML='';var n=nInt+nDec,max=Math.pow(10,n)-1,T=0,ss=[],first=true;
+  var row=document.createElement('div');row.className='drums';host.appendChild(row);
+  function w(p){return Math.pow(10,n-1-p)}
+  function render(nT,animate){var old=T;T=nT;ss.forEach(function(s,p){var nd=Math.floor(T/w(p))%10,od=Math.floor(old/w(p))%10;roll(s,od,nd,T>old,T<old,animate&&!first)});first=false;
+    $$('.drum',row).forEach(function(d,p){d.setAttribute('aria-valuenow',Math.floor(T/w(p))%10)})}
+  function step(p,dir){var nT=clamp(T+dir*w(p),0,max);if(nT===T)return;render(nT,true);onChange(T/Math.pow(10,nDec))}
+  for(var p=0;p<n;p++){
+    if(p===nInt&&nDec>0){var cm=document.createElement('span');cm.className='comma';cm.textContent=',';row.appendChild(cm)}
+    (function(p){
+      var col=document.createElement('div');col.className='dcol';
+      var up=document.createElement('button');up.type='button';up.className='nudge';up.innerHTML=UP;up.setAttribute('aria-label','+');
+      var dn=document.createElement('button');dn.type='button';dn.className='nudge';dn.innerHTML=DN;dn.setAttribute('aria-label','−');
+      var b=buildDrum(p>=nInt?'dec':'');var drum=b.drum;
+      drum.tabIndex=0;drum.setAttribute('role','spinbutton');drum.setAttribute('aria-valuemin','0');drum.setAttribute('aria-valuemax','9');drum.setAttribute('aria-label',label+' '+(p+1));
+      up.addEventListener('click',function(){step(p,1)});dn.addEventListener('click',function(){step(p,-1)});
+      var drag=null;
+      drum.addEventListener('pointerdown',function(e){drag={y:e.clientY,acc:0};try{drum.setPointerCapture(e.pointerId)}catch(x){}});
+      drum.addEventListener('pointermove',function(e){if(!drag)return;var steps=Math.trunc((drag.y-e.clientY)/24),diff=steps-drag.acc;if(diff){for(var k=0;k<Math.abs(diff);k++)step(p,diff>0?1:-1);drag.acc=steps}});
+      drum.addEventListener('pointerup',function(){drag=null});drum.addEventListener('pointercancel',function(){drag=null});
+      drum.addEventListener('wheel',function(e){e.preventDefault();step(p,e.deltaY<0?1:-1)},{passive:false});
+      drum.addEventListener('keydown',function(e){if(e.key==='ArrowUp'){e.preventDefault();step(p,1)}else if(e.key==='ArrowDown'){e.preventDefault();step(p,-1)}});
+      col.appendChild(up);col.appendChild(drum);col.appendChild(dn);row.appendChild(col);ss.push(b.strip)
+    })(p)}
+  return {set:function(v,animate){render(clamp(Math.round(v*Math.pow(10,nDec)),0,max),animate)}}}
+
+/* ---------- UI ---------- */
+var meters={},odo=null,lastU=null;
+function fmtIdx(v,d){return d?Number(v).toFixed(d).replace('.',','):String(Math.round(v))}
+
+function renderStatic(){
+  var app=$('#app');app.lang=S.lang;app.dir=S.lang==='ar'?'rtl':'ltr';app.dataset.util=S.tab;
+  $('#tName').textContent=t('name');$('#tTag').textContent=t('tag');
+  $$('.lang button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.lang===S.lang?'true':'false')});
+  $('#demo').hidden=!S.demo;$('#demoTxt').textContent=t('demo');$('#demoBtn').textContent=t('demoBtn');
+  $('#tabs').innerHTML=UTILS.map(function(u){return '<button type="button" class="tab" role="tab" data-u="'+u+'" aria-selected="'+(u===S.tab)+'">'+ICON[u]+'<span>'+t('tab_'+u)+'</span></button>'}).join('');
+  $('#roLabel').textContent=t('roLabel');$('#roCur').textContent=t('da');
+  $('#btnSave').textContent=t('save');$('#btnNew').textContent=t('newBill');
+  $('#stTitle').textContent=t('stTitle');$('#stSub').textContent=t('stSub');$('#disc').textContent=t('disc');
+  document.title=t('name')}
+
+function plateHTML(which){
+  var u=S.tab,d=MET[u].d;
+  var q=which==='start'?'<div class="quick"><span>'+t('ago')+'</span><button type="button" class="chip" data-ago="30">'+t('m1')+'</button><button type="button" class="chip" data-ago="61">'+t('m2')+'</button><button type="button" class="chip" data-ago="91">'+t('m3')+'</button></div>':'';
+  return '<div class="plate-head"><div><h2 class="plate-title">'+t(which==='start'?'pStart':'pCur')+'</h2><p class="plate-hint">'+t(which==='start'?'hStart':'hCur')+'</p></div><span class="tag demo-tag"'+(S.demo?'':' hidden')+'>'+t('example')+'</span></div>'+
+  '<div data-host="'+which+'"></div>'+
+  '<div class="meter-unit"><b>'+MU[u]+'</b><span>'+t('drumHelp')+'</span></div>'+
+  '<div class="fields"><label class="fld"><span>'+t('typeIdx')+'</span><input id="'+which+'-idx" inputmode="decimal" autocomplete="off"></label>'+
+  '<label class="fld"><span>'+t('dateOn')+'</span><input type="date" id="'+which+'-date"></label></div>'+q+
+  '<div class="photo-row"><button type="button" class="btn" data-photo="'+which+'">'+CAM+'<span>'+t('photo')+'</span></button><input type="file" accept="image/*" capture="environment" hidden id="'+which+'-file"><span id="'+which+'-thumb"></span></div>'}
+
+function renderThumb(which){
+  var host=$('#'+which+'-thumb'),src=S.u[S.tab].photo[which];if(!host)return;
+  if(!src){host.innerHTML='';return}
+  host.innerHTML='<span class="thumb-box"><button type="button" class="thumb" data-zoom="'+which+'"><img alt="" src="'+src+'"></button><button type="button" class="thumb-x" data-unphoto="'+which+'" aria-label="'+t('photoDel')+'">×</button></span>'}
+
+function renderPlates(){
+  var u=S.tab,cfg=MET[u];
+  ['start','cur'].forEach(function(which){
+    var el=$(which==='start'?'#plateStart':'#plateCur');el.innerHTML=plateHTML(which);
+    var st=S.u[u][which];
+    var m=Meter($('[data-host="'+which+'"]',el),cfg.n-cfg.d,cfg.d,function(v){st.idx=v;touch();$('#'+which+'-idx').value=fmtIdx(v,cfg.d);recompute();save()},t('typeIdx'));
+    meters[which]=m;m.set(st.idx||0,false);
+    var inp=$('#'+which+'-idx');inp.value=fmtIdx(st.idx||0,cfg.d);
+    inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;st.idx=v;touch();m.set(v,true);recompute();save()});
+    var di=$('#'+which+'-date');di.value=st.date;
+    di.addEventListener('change',function(){if(di.value){st.date=di.value;touch();recompute();save()}});
+    var btn=$('[data-photo="'+which+'"]',el),file=$('#'+which+'-file');
+    btn.addEventListener('click',function(){file.click()});
+    file.addEventListener('change',function(){var f=file.files&&file.files[0];if(!f)return;readPhoto(f,function(src){S.u[u].photo[which]=src;touch();renderThumb(which);save()});file.value=''});
+    renderThumb(which)});
+  $$('[data-ago]').forEach(function(b){b.addEventListener('click',function(){var st=S.u[u];st.start.date=addDays(st.cur.date,-Number(b.dataset.ago));$('#start-date').value=st.start.date;touch();recompute();save()})})}
+
+function readPhoto(file,cb){var r=new FileReader();r.onload=function(){var img=new Image();img.onload=function(){var mx=320,sc=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.62))};img.src=r.result};r.readAsDataURL(file)}
+
+function stairSVG(U,Qc,unit){
+  var W=336,x0=12,base=164,maxH=108,n=U.tr.length,w=W/n,L=limits(U),maxP=0,s='';
+  U.tr.forEach(function(tr){maxP=Math.max(maxP,tr.price)});
+  var mIdx=0,mFrac=0;
+  U.tr.forEach(function(tr,i){
+    var h=tr.price/maxP*maxH,x=x0+i*w,y=base-h,span=L.his[i]-L.los[i],fr=clamp((Qc-L.los[i])/span,0,1);
+    if(Qc>=L.los[i]&&(Qc<L.his[i]||i===n-1)){mIdx=i;mFrac=fr}
+    s+='<rect class="s-bg" x="'+(x+1)+'" y="'+y+'" width="'+(w-2)+'" height="'+h+'"/>';
+    if(fr>0)s+='<rect class="s-fill" x="'+(x+1)+'" y="'+y+'" width="'+((w-2)*fr)+'" height="'+h+'"/>';
+    s+='<text class="s-price" x="'+(x+w/2)+'" y="'+(y-6)+'">'+nf(tr.price,tr.price<1?4:2)+'</text>';
+    s+='<text class="s-t" x="'+(x+w/2)+'" y="'+(base-9)+'">T'+(i+1)+'</text>';
+    if(i<n-1)s+='<text class="s-lim" x="'+(x+w)+'" y="'+(base+17)+'">'+nf(tr.lim,0)+'</text>'});
+  s+='<text class="s-lim" x="'+x0+'" y="'+(base+17)+'">0</text>';
+  s+='<line class="s-axis" x1="'+x0+'" x2="'+(x0+W)+'" y1="'+base+'" y2="'+base+'"/>';
+  var mx=x0+mIdx*w+mFrac*w,anchor=mx>W-80?'end':mx<80?'start':'middle',lx=anchor==='end'?mx+4:anchor==='start'?mx-4:mx;
+  s+='<line class="s-mark" x1="'+mx+'" x2="'+mx+'" y1="30" y2="'+(base+3)+'"/><path class="s-mtri" d="M'+(mx-5)+' 22 L'+(mx+5)+' 22 L'+mx+' 31 Z"/>';
+  s+='<text class="s-mlbl" x="'+lx+'" y="14" text-anchor="'+anchor+'">'+t('mark',nf(Qc,Qc<100&&unit!=='kWh'?1:0),unit)+'</text>';
+  return '<svg class="stair" viewBox="0 0 360 188" role="img" aria-label="'+t('stTitle')+'">'+s+'</svg>'}
+
+var ROW=function(label,small,val,cls){return '<div class="row'+(cls?' '+cls:'')+'"><span>'+label+(small?'<small>'+small+'</small>':'')+'</span><b>'+val+'</b></div>'};
+
+function recompute(){
+  var u=S.tab,st=S.u[u],U=P(u),bu=BU[u],mu=MU[u];
+  var consM=Math.max(0,(st.cur.idx||0)-(st.start.idx||0)),neg=(st.cur.idx||0)<(st.start.idx||0);
+  var cons=u==='gaz'?consM*U.coef:consM,days=daysBetween(st.start.date,st.cur.date),ok=days>=1;
+  var rate=ok?cons/days:0,Qc=ok?(Math.abs(days-DAYQ)<4?cons:rate*DAYQ):0;
+  var B=bill(u,U,Qc),f=st.cal&&st.cal.on?st.cal.f:1,total=B.total*f,sofar=ok?total*(Math.min(days,DAYQ)/DAYQ):0;
+  var L=limits(U),da=t('da');
+
+  odo.set(ok?total:0);
+  $('#srAmount').textContent=ok?nf(total,0)+' '+da:'';
+  var pill=$('#roPill');pill.textContent=ok?t('tranche',B.idx+1):'—';
+  var meta=u==='gaz'?t('metaG',nf(consM,1),nf(cons,0),days,nf(rate,1)):t('metaA',nf(cons,u==='eau'?1:0),bu,days,nf(rate,u==='eau'?2:1));
+  $('#roMeta').textContent=ok?meta:'';
+  $('#roSub').textContent=(ok&&Math.abs(days-DAYQ)>=4)?t('soFar',nf(sofar,0))+(f!==1?'  ·  '+t('calOn',nf(f,3)):''):(ok&&f!==1?t('calOn',nf(f,3)):'');
+  var w=$('#roWarn');if(neg){w.textContent=t('warnNeg');w.hidden=false}else if(!ok){w.textContent=t('warnDays');w.hidden=false}else w.hidden=true;
+
+  $('#stairHost').innerHTML=stairSVG(U,Qc,bu);
+  var tips=[];
+  if(ok){
+    var i=B.idx,last=i===U.tr.length-1;
+    tips.push(t('tipIn',i+1,nf(U.tr[i].price,U.tr[i].price<1?4:2),bu));
+    if(!last){var up=(U.tr[i+1].price/U.tr[i].price-1)*100;tips.push(t('tipMargin',i+2,nf(up,0),nf(Math.max(0,U.tr[i].lim-Qc),bu==='m³'?1:0),bu))}
+    else tips.push(t('tipLast'));
+    if(i>0){var tgt=U.tr[i-1].lim,sv=(B.total-bill(u,U,tgt).total)*f;if(sv>=1)tips.push(t('tipSave',nf(tgt,0),bu,nf(sv,0)))}}
+  $('#tips').innerHTML=tips.map(function(x){return '<p>'+x+'</p>'}).join('');
+
+  var rows='';
+  B.lines.forEach(function(l){rows+=ROW(t('tkTr',l.i+1),nf(l.q,bu==='m³'?1:0)+' '+bu+' × '+nf(l.price,l.price<1?4:2),nf(l.amt)+' '+da)});
+  B.fx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
+  rows+=ROW(t('tkHT'),'',nf(B.ht)+' '+da,'sub')+ROW(t('tkTVA'),'',nf(B.tva)+' '+da);
+  if(f!==1)rows+=ROW(t('tkCal',nf(f,3)),'',(f>1?'+':'−')+nf(Math.abs(B.total*(f-1)))+' '+da);
+  rows+=ROW(t('tkTotal'),'',nf(total)+' '+da,'total');
+  $('#ticket').innerHTML='<h2>'+t('tkTitle')+'</h2><p class="base">'+t('tkBase',nf(Qc,bu==='m³'?1:0),bu)+'</p><div class="rows">'+(ok?rows:'')+'</div>'}
+
+function renderHist(){
+  var u=S.tab,h=S.u[u].hist.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0}),d=MET[u].d;
+  var li=h.length?h.map(function(e,k){var prev=h[k+1],delta=prev?Math.max(0,e.idx-prev.idx):null;
+    return '<li><div class="h-main"><b>'+e.date+' · '+fmtIdx(e.idx,d)+' '+MU[u]+'</b>'+(delta!=null?'<small>'+t('histDelta',nf(delta,d?1:0),MU[u])+'</small>':'')+'</div><div class="h-act"><button type="button" class="mini" data-use="'+e.id+'">'+t('histUse')+'</button><button type="button" class="mini" data-del="'+e.id+'">'+t('histDel')+'</button></div></li>'}).join(''):'<li class="hint">'+t('histEmpty')+'</li>';
+  $('#histCard').innerHTML='<h2>'+t('histTitle')+'</h2><ul class="hist" style="margin-top:8px">'+li+'</ul>'}
+
+function renderCal(){
+  var u=S.tab,st=S.u[u],el=$('#calCard');var open=el.open;
+  el.innerHTML='<summary>'+t('calTitle')+'</summary><div class="body"><p class="hint">'+t('calHelp')+'</p><div class="pgrid"><label class="fld"><span>'+t('calCons',BU[u])+'</span><input id="cal-cons" inputmode="decimal"></label><label class="fld"><span>'+t('calPaid')+'</span><input id="cal-paid" inputmode="decimal"></label></div><div class="ro-actions" style="margin:0"><button type="button" class="btn primary" id="cal-go">'+t('calApply')+'</button>'+(st.cal?'<button type="button" class="btn" id="cal-clear">'+t('calClear')+'</button>':'')+'</div><p class="hint" id="cal-msg">'+(st.cal?t('calOn',nf(st.cal.f,3)):'')+'</p></div>';
+  el.open=open}
+
+function renderBar(){
+  var u=S.tab,U=P(u),el=$('#barCard'),open=el.open,bu=BU[u];
+  var g='<span class="hd"></span><span class="hd">'+t('bUpTo')+'</span><span class="hd">'+t('bPrice',bu)+'</span><span class="hd">'+t('bTva')+'</span>';
+  U.tr.forEach(function(tr,i){g+='<span class="tn">'+t('bTr',i+1)+'</span><input id="b-lim-'+i+'" inputmode="decimal" value="'+(tr.lim==null?'':tr.lim)+'" '+(tr.lim==null?'disabled placeholder="'+t('bLast')+'"':'')+'><input id="b-price-'+i+'" inputmode="decimal" value="'+tr.price+'"><input id="b-tva-'+i+'" inputmode="decimal" value="'+tr.tva+'">'});
+  var spec={elec:[['fixed','power','bPower'],['fixed','perKwMonth','bPerKw'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
+            gaz:[['coef',null,'bCoef'],['fixed','perMonth','bPerMonth'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
+            eau:[['fixed','perMonth','bFixeEau'],['fixed','tvaFixed','bTvaFixed'],['sanit',null,'bSanit'],['other',null,'bOther']]}[u];
+  var pg=spec.map(function(sp,k){var v=sp[1]?U[sp[0]][sp[1]]:U[sp[0]];return '<label class="fld"><span>'+t(sp[2])+'</span><input id="b-p-'+k+'" inputmode="decimal" value="'+v+'"></label>'}).join('');
+  el.innerHTML='<summary>'+t('bTitle')+'</summary><div class="body"><p class="hint">'+t('bNote')+'</p><div class="tr-grid">'+g+'</div><div class="pgrid">'+pg+'</div><div><button type="button" class="btn" id="b-reset">'+t('bReset')+'</button></div></div>';
+  el.open=open;
+  U.tr.forEach(function(tr,i){
+    ['lim','price','tva'].forEach(function(f){var inp=$('#b-'+f+'-'+i);if(!inp||inp.disabled)return;
+      inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;editP(u).tr[i][f]=v;touch();recompute();save()})})});
+  spec.forEach(function(sp,k){var inp=$('#b-p-'+k);inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;var p=editP(u);if(sp[1])p[sp[0]][sp[1]]=v;else p[sp[0]]=v;touch();recompute();save()})});
+  $('#b-reset').addEventListener('click',function(){S.u[u].p=null;renderBar();recompute();save()})}
+
+function renderSrc(){
+  var L=[['https://creg.gov.dz/wp-content/uploads/2021/11/D-06-05-FR.pdf','s_creg'],
+   ['https://www.echoroukonline.com/sonelgaz-applies-new-tariffs-not-contained-in-the-2016-finance-law','s_echo'],
+   ['https://www.algerie360.com/electricite-gaz-les-nouveaux-tarifs-applicables-pour-les-quantites-consommees-a-partir-du-1er-janvier-2016/','s_a360'],
+   ['https://www.algerie360.com/vos-factures-sonelgaz-augmenteront-en-2025-nous-vous-revelons-les-montants-du-nouvel-impot/','s_485'],
+   ['https://www.iwra.org/congress/2008/resource/authors/abs412_article.pdf','s_iwra']];
+  $('#srcCard').innerHTML='<h2>'+t('srcTitle')+'</h2><ul class="src" style="margin-top:10px">'+L.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener noreferrer">'+t(x[1])+'</a></li>'}).join('')+'</ul>'}
+
+function renderAll(){renderStatic();renderPlates();renderCal();renderBar();renderHist();renderSrc();recompute()}
+
+function flash(msg){var f=$('#flash');f.textContent=msg;clearTimeout(flash._t);flash._t=setTimeout(function(){f.textContent=''},2400)}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var tg=e.target.closest?e.target.closest('button,[data-lang]'):null;if(!tg)return;
+  var u=S.tab,st=S.u[u];
+  if(tg.dataset.lang){S.lang=tg.dataset.lang;save();renderAll();return}
+  if(tg.classList.contains('tab')){S.tab=tg.dataset.u;save();renderAll();return}
+  if(tg.id==='demoBtn'){UTILS.forEach(function(k){var x=S.u[k];x.start.idx=0;x.cur.idx=0;x.start.date=addDays(x.cur.date,-61)});S.demo=false;save();renderAll();return}
+  if(tg.id==='btnSave'){var h=st.hist;if(!h.some(function(x){return x.date===st.cur.date&&x.idx===st.cur.idx}))h.push({id:String(Date.now()),date:st.cur.date,idx:st.cur.idx,photo:st.photo.cur});if(h.length>12)h.shift();touch();save();renderHist();flash(t('saved'));return}
+  if(tg.id==='btnNew'){var a=st.cur;if(!st.hist.some(function(x){return x.date===a.date&&x.idx===a.idx}))st.hist.push({id:String(Date.now()),date:a.date,idx:a.idx,photo:st.photo.cur});
+    st.start={idx:a.idx,date:a.date};st.photo.start=st.photo.cur;st.photo.cur=null;touch();save();renderPlates();renderHist();recompute();flash(t('newDone'));return}
+  if(tg.dataset.use){var en=st.hist.filter(function(x){return x.id===tg.dataset.use})[0];if(en){st.start={idx:en.idx,date:en.date};st.photo.start=en.photo||null;touch();save();renderPlates();recompute()}return}
+  if(tg.dataset.del){st.hist=st.hist.filter(function(x){return x.id!==tg.dataset.del});save();renderHist();return}
+  if(tg.dataset.unphoto){st.photo[tg.dataset.unphoto]=null;renderThumb(tg.dataset.unphoto);save();return}
+  if(tg.dataset.zoom){var src=st.photo[tg.dataset.zoom];if(src){var lb=document.createElement('div');lb.className='lightbox';lb.innerHTML='<img alt="" src="'+src+'">';lb.addEventListener('click',function(){lb.remove()});document.body.appendChild(lb)}return}
+  if(tg.id==='cal-go'){var c=num($('#cal-cons').value),p=num($('#cal-paid').value),msg=$('#cal-msg');
+    if(!(c>0&&p>0)){msg.textContent=t('calErr');return}
+    var est=bill(u,P(u),c).total,f=p/est;st.cal={f:f,on:true};save();recompute();
+    var pc=Math.abs(f-1)*100;msg.textContent=t('calRes',nf(pc,1),f>=1?t('calHigh'):t('calLow'));
+    if(!$('#cal-clear')){var b=document.createElement('button');b.type='button';b.className='btn';b.id='cal-clear';b.textContent=t('calClear');tg.parentNode.appendChild(b)}return}
+  if(tg.id==='cal-clear'){st.cal=null;save();renderCal();recompute();return}
+});
+
+/* ---------- boot ---------- */
+odo=Odo($('#odo'),6);
+renderAll();
+})();
+</script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+</body></html>
