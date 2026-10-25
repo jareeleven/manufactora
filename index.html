@@ -168,6 +168,8 @@ h1,h2,h3,p{margin:0}
 .ticket .row b{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ticket .row.total{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px;font-weight:800;font-size:17px}
 .ticket .row.total b{font-weight:800}
+.ticket .row.mute{color:var(--muted);font-size:13px;padding:5px 0}
+.ticket .row.mute b{font-weight:500}
 .ticket .base{color:var(--muted);font-size:13px;margin:6px 0 4px}
 .ticket .rows{margin-top:6px}
 
@@ -248,6 +250,7 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
         <div class="tips" id="tips"></div>
       </article>
       <article class="card ticket" id="ticket"></article>
+      <article class="card ticket" id="combo"></article>
     </section>
   </main>
 
@@ -264,7 +267,7 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 'use strict';
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-var DAYQ=91.25, KEY='kaddach.v1', UTILS=['elec','gaz','eau'];
+var DAYQ=91.25, KEY='kaddach.v2', UTILS=['elec','gaz','eau'];
 
 /* ---------- helpers ---------- */
 function ISO(d){var z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
@@ -279,8 +282,8 @@ function clone(o){return JSON.parse(JSON.stringify(o))}
 /* ---------- tariffs (per quarter, household) ---------- */
 var DEF={
   elec:{tr:[{lim:125,price:1.7787,tva:9},{lim:250,price:4.1789,tva:9},{lim:1000,price:4.8120,tva:19},{lim:null,price:5.4798,tva:19}],
-        fixed:{power:6,perKwMonth:4.16,tvaFixed:9},other:0},
-  gaz:{coef:9.25,tr:[{lim:1125,price:0.1682,tva:9},{lim:2500,price:0.3245,tva:9},{lim:7500,price:0.4025,tva:19},{lim:null,price:0.4600,tva:19}],
+        fixed:{power:6,perKwMonth:4.37,tvaFixed:9},th:150,other:0},
+  gaz:{coef:9.7,tr:[{lim:1125,price:0.1682,tva:9},{lim:2500,price:0.3245,tva:9},{lim:7500,price:0.4025,tva:19},{lim:null,price:0.4600,tva:19}],
         fixed:{perMonth:28.5,tvaFixed:9},other:0},
   eau:{tr:[{lim:25,price:6.30,tva:9},{lim:55,price:20.48,tva:9},{lim:82,price:34.65,tva:9},{lim:null,price:40.95,tva:9}],
         fixed:{perMonth:0,tvaFixed:9},sanit:0,other:0}
@@ -346,13 +349,25 @@ ar:{name:'قداش الفاتورة',tag:'أدخل مؤشر عدّادك وشا�
  s_creg:'قرار لجنة الضبط D/06-05 (2005): أسعار الشريحتين 1 و2 وعتبات الغاز',s_echo:'الشروق: زيادات الشريحتين 3 و4 (2016)',s_a360:'الجزائر360: عتبات الشرائح وزيادات 2016',
  s_485:'الجزائر360: الحق الثابت (المادة 485 مكرر)',s_iwra:'IWRA: تعريفة ماء الشرب للأسر (مرسوم 2005)'}
 };
+Object.assign(I.fr,{demo:"Valeurs d'exemple (facture Sonelgaz du 4e trimestre 2025) pour te montrer comment ça marche.",
+ tkPrime:'Abonnement électricité (puissance {0} kW)',tkRedGaz:'Abonnement gaz',tkDroit:'Droit fixe sur consommation',tkHT:'Montant HT',tkTVA:'TVA à {0} %',
+ tkTH:"Taxe d'habitation",tkTTC:'Net à payer TTC',tkStamp:'Timbre (paiement en espèces)',tkCash:'Total à payer en espèces',tkAbo:'Abonnement (redevances fixes)',
+ cbTitle:'Facture Sonelgaz : électricité + gaz',cbNote:'Comme sur ta facture papier : un seul total pour les deux énergies.',cbElec:'Électricité (montant HT)',cbGaz:'Gaz (montant HT)',
+ bTH:"Taxe d'habitation par trimestre (DA)",bCoef:'PCS : thermies par m³ (écrit sur ta facture)',bPerKw:'Abonnement par kW et par mois (DA)',bPerMonth:'Abonnement gaz par mois (DA)',
+ bNote:"Prix par tranche, TVA par tranche, droit fixe et coefficient du gaz : vérifiés sur une facture Sonelgaz du 4e trimestre 2025. L'abonnement est un total commun aux deux énergies, réparti ici entre électricité et gaz. La taxe d'habitation dépend de ta commune. Contrôle ces valeurs sur ta facture."});
+Object.assign(I.ar,{demo:'هذه قيم تجريبية (فاتورة سونلغاز للثلاثي الرابع 2025) لتوضيح طريقة العمل.',
+ tkPrime:'اشتراك الكهرباء (القدرة {0} كيلواط)',tkRedGaz:'اشتراك الغاز',tkDroit:'الحق الثابت على الاستهلاك',tkHT:'المبلغ دون رسم',tkTVA:'الرسم على القيمة المضافة {0} %',
+ tkTH:'رسم السكن',tkTTC:'الصافي للدفع بجميع الرسوم',tkStamp:'الطابع (الدفع نقدا)',tkCash:'المستحق الإجمالي (نقدا)',tkAbo:'الاشتراك (الإتاوات الثابتة)',
+ cbTitle:'فاتورة سونلغاز: كهرباء + غاز',cbNote:'مثل فاتورتك الورقية: مجموع واحد للطاقتين.',cbElec:'الكهرباء (المبلغ دون رسم)',cbGaz:'الغاز (المبلغ دون رسم)',
+ bTH:'رسم السكن في الثلاثي (دج)',bCoef:'معامل PCS: ث حرارية لكل م³ (مكتوب في فاتورتك)',bPerKw:'الاشتراك لكل كيلواط شهريا (دج)',bPerMonth:'اشتراك الغاز شهريا (دج)',
+ bNote:'أسعار الشرائح والرسم لكل شريحة والحق الثابت ومعامل الغاز: تم التحقق منها على فاتورة سونلغاز للثلاثي الرابع 2025. الاشتراك مبلغ مشترك بين الطاقتين وقد وزّعناه بين الكهرباء والغاز. رسم السكن يختلف حسب البلدية. تحقّق من هذه القيم في فاتورتك.'});
 function t(k){var a=arguments,s=(I[S.lang]&&I[S.lang][k]);if(s==null)s=I.fr[k];if(s==null)return k;
   return String(s).replace(/\{(\d)\}/g,function(_,i){var v=a[+i+1];return v==null?'':v})}
 
 /* ---------- state ---------- */
 function mk(a,b,sd,cd){return {start:{idx:a,date:sd},cur:{idx:b,date:cd},photo:{start:null,cur:null},hist:[],cal:null,p:null}}
-function seed(){var d=today(),s=addDays(d,-62);
-  return {v:1,lang:'fr',tab:'elec',demo:true,u:{elec:mk(48210,48385,s,d),gaz:mk(1820,1895.5,s,d),eau:mk(3210,3241.2,s,d)}}}
+function seed(){var d=today(),s=addDays(d,-91);
+  return {v:1,lang:'fr',tab:'elec',demo:true,u:{elec:mk(28683,29403,s,d),gaz:mk(7365,7425,s,d),eau:mk(3210,3241.2,s,d)}}}
 function load(){var s=null;try{var r=localStorage.getItem(KEY);if(r)s=JSON.parse(r)}catch(e){}
   if(!s||!s.u||!s.u.elec||!s.u.gaz||!s.u.eau)s=seed();
   UTILS.forEach(function(u){s.u[u].cur.date=today();s.u[u].photo=s.u[u].photo||{start:null,cur:null};s.u[u].hist=s.u[u].hist||[]});
@@ -365,20 +380,31 @@ function touch(){if(S.demo){S.demo=false;$('#demo').hidden=true;$$('.demo-tag').
 
 /* ---------- billing engine ---------- */
 function levy(q){return q<70?0:q<=190?25:q<=390?100:200}
+function r2(x){return Math.round(x*100+1e-9)/100}
+function finish(o){
+  o.tvaRows=[];o.tva=0;
+  Object.keys(o.bases).map(Number).sort(function(a,b){return a-b}).forEach(function(rate){
+    if(rate>0){var v=r2(o.bases[rate]*rate/100);o.tvaRows.push({rate:rate,base:o.bases[rate],tva:v});o.tva+=v}});
+  o.ht=r2(o.ht);o.total=r2(o.ht+o.tva+o.taxes)}
 function bill(u,U,q){
-  var o={lines:[],fx:[],ht:0,tva:0,total:0,idx:0},lo=0,found=false;
+  var o={lines:[],fx:[],tx:[],bases:{},ht:0,en:0,taxes:0,idx:0},lo=0,found=false;
+  function base(rate,amt){o.bases[rate]=(o.bases[rate]||0)+amt}
   U.tr.forEach(function(tr,i){
     var hi=tr.lim==null?Infinity:tr.lim,part=Math.max(0,Math.min(q,hi)-lo);
-    if(part>1e-9){var amt=part*tr.price;o.lines.push({i:i,q:part,price:tr.price,amt:amt,tva:tr.tva});o.ht+=amt;o.tva+=amt*tr.tva/100}
+    if(part>1e-9){var amt=part*tr.price;o.lines.push({i:i,q:part,price:tr.price,amt:amt,tva:tr.tva});o.ht+=amt;o.en+=amt;base(tr.tva,amt)}
     if(!found&&q<=hi){o.idx=i;found=true}
     lo=hi});
-  var base=o.ht;
-  function fx(key,args,amt,tva){if(amt>0){o.fx.push({key:key,args:args,amt:amt});o.ht+=amt;o.tva+=amt*tva/100}}
-  if(u==='elec'){fx('tkPrime',[U.fixed.power],U.fixed.power*U.fixed.perKwMonth*3,U.fixed.tvaFixed);fx('tkDroit',[],levy(q),0)}
+  function fx(key,args,amt,rate){if(amt>0){o.fx.push({key:key,args:args,amt:amt});o.ht+=amt;base(rate,amt)}}
+  function tx(key,args,amt){if(amt>0){o.tx.push({key:key,args:args,amt:amt});o.taxes+=amt}}
+  if(u==='elec'){fx('tkPrime',[U.fixed.power],U.fixed.power*U.fixed.perKwMonth*3,U.fixed.tvaFixed);tx('tkDroit',[],levy(q));tx('tkTH',[],U.th)}
   if(u==='gaz'){fx('tkRedGaz',[],U.fixed.perMonth*3,U.fixed.tvaFixed)}
-  if(u==='eau'){fx('tkFixeEau',[],U.fixed.perMonth*3,U.fixed.tvaFixed);fx('tkSanit',[U.sanit],base*U.sanit/100,0)}
-  fx('tkOther',[],U.other,0);
-  o.total=o.ht+o.tva;return o}
+  if(u==='eau'){fx('tkFixeEau',[],U.fixed.perMonth*3,U.fixed.tvaFixed);fx('tkSanit',[U.sanit],o.en*U.sanit/100,0)}
+  tx('tkOther',[],U.other);
+  finish(o);return o}
+function combine(a,b){
+  var o={ht:a.ht+b.ht,en:a.en+b.en,taxes:a.taxes+b.taxes,bases:{},tx:a.tx.concat(b.tx),fx:a.fx.concat(b.fx)};
+  [a,b].forEach(function(x){Object.keys(x.bases).forEach(function(r){o.bases[r]=(o.bases[r]||0)+x.bases[r]})});
+  finish(o);return o}
 function limits(U){var los=[],his=[],lo=0;U.tr.forEach(function(tr,i){var hi=tr.lim==null?(i>0?lo+(lo-los[i-1]):lo||1):tr.lim;los.push(lo);his.push(hi);lo=hi});return {los:los,his:his}}
 
 /* ---------- drums ---------- */
@@ -496,21 +522,24 @@ function stairSVG(U,Qc,unit){
 
 var ROW=function(label,small,val,cls){return '<div class="row'+(cls?' '+cls:'')+'"><span>'+label+(small?'<small>'+small+'</small>':'')+'</span><b>'+val+'</b></div>'};
 
-function recompute(){
-  var u=S.tab,st=S.u[u],U=P(u),bu=BU[u],mu=MU[u];
+function calc(u){
+  var st=S.u[u],U=P(u);
   var consM=Math.max(0,(st.cur.idx||0)-(st.start.idx||0)),neg=(st.cur.idx||0)<(st.start.idx||0);
   var cons=u==='gaz'?consM*U.coef:consM,days=daysBetween(st.start.date,st.cur.date),ok=days>=1;
   var rate=ok?cons/days:0,Qc=ok?(Math.abs(days-DAYQ)<4?cons:rate*DAYQ):0;
-  var B=bill(u,U,Qc),f=st.cal&&st.cal.on?st.cal.f:1,total=B.total*f,sofar=ok?total*(Math.min(days,DAYQ)/DAYQ):0;
-  var L=limits(U),da=t('da');
+  var B=bill(u,U,Qc),f=st.cal&&st.cal.on?st.cal.f:1;
+  return {u:u,st:st,U:U,consM:consM,neg:neg,cons:cons,days:days,ok:ok,rate:rate,Qc:Qc,B:B,f:f,total:r2(B.total*f)}}
 
+function recompute(){
+  var u=S.tab,c=calc(u),U=c.U,B=c.B,f=c.f,total=c.total,ok=c.ok,days=c.days,Qc=c.Qc,bu=BU[u],da=t('da');
+  var sofar=ok?total*(Math.min(days,DAYQ)/DAYQ):0;
   odo.set(ok?total:0);
   $('#srAmount').textContent=ok?nf(total,0)+' '+da:'';
-  var pill=$('#roPill');pill.textContent=ok?t('tranche',B.idx+1):'—';
-  var meta=u==='gaz'?t('metaG',nf(consM,1),nf(cons,0),days,nf(rate,1)):t('metaA',nf(cons,u==='eau'?1:0),bu,days,nf(rate,u==='eau'?2:1));
+  $('#roPill').textContent=ok?t('tranche',B.idx+1):'—';
+  var meta=u==='gaz'?t('metaG',nf(c.consM,1),nf(c.cons,0),days,nf(c.rate,1)):t('metaA',nf(c.cons,u==='eau'?1:0),bu,days,nf(c.rate,u==='eau'?2:1));
   $('#roMeta').textContent=ok?meta:'';
   $('#roSub').textContent=(ok&&Math.abs(days-DAYQ)>=4)?t('soFar',nf(sofar,0))+(f!==1?'  ·  '+t('calOn',nf(f,3)):''):(ok&&f!==1?t('calOn',nf(f,3)):'');
-  var w=$('#roWarn');if(neg){w.textContent=t('warnNeg');w.hidden=false}else if(!ok){w.textContent=t('warnDays');w.hidden=false}else w.hidden=true;
+  var w=$('#roWarn');if(c.neg){w.textContent=t('warnNeg');w.hidden=false}else if(!ok){w.textContent=t('warnDays');w.hidden=false}else w.hidden=true;
 
   $('#stairHost').innerHTML=stairSVG(U,Qc,bu);
   var tips=[];
@@ -525,10 +554,27 @@ function recompute(){
   var rows='';
   B.lines.forEach(function(l){rows+=ROW(t('tkTr',l.i+1),nf(l.q,bu==='m³'?1:0)+' '+bu+' × '+nf(l.price,l.price<1?4:2),nf(l.amt)+' '+da)});
   B.fx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
-  rows+=ROW(t('tkHT'),'',nf(B.ht)+' '+da,'sub')+ROW(t('tkTVA'),'',nf(B.tva)+' '+da);
+  rows+=ROW(t('tkHT'),'',nf(B.ht)+' '+da,'sub');
+  B.tvaRows.forEach(function(r){rows+=ROW(t('tkTVA',r.rate),'',nf(r.tva)+' '+da)});
+  B.tx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
   if(f!==1)rows+=ROW(t('tkCal',nf(f,3)),'',(f>1?'+':'−')+nf(Math.abs(B.total*(f-1)))+' '+da);
-  rows+=ROW(t('tkTotal'),'',nf(total)+' '+da,'total');
-  $('#ticket').innerHTML='<h2>'+t('tkTitle')+'</h2><p class="base">'+t('tkBase',nf(Qc,bu==='m³'?1:0),bu)+'</p><div class="rows">'+(ok?rows:'')+'</div>'}
+  rows+=ROW(t('tkTTC'),'',nf(total)+' '+da,'total');
+  var stamp=Math.ceil(total/100);
+  rows+=ROW(t('tkStamp'),'',nf(stamp)+' '+da,'mute')+ROW(t('tkCash'),'',nf(total+stamp)+' '+da,'mute');
+  $('#ticket').innerHTML='<h2>'+t('tkTitle')+'</h2><p class="base">'+t('tkBase',nf(Qc,bu==='m³'?1:0),bu)+'</p><div class="rows">'+(ok?rows:'')+'</div>';
+  renderCombo()}
+
+function renderCombo(){
+  var E=calc('elec'),G=calc('gaz'),C=combine(E.B,G.B),da=t('da'),rows='',abo=0;
+  C.fx.forEach(function(x){abo+=x.amt});
+  rows+=ROW(t('cbElec'),'',nf(E.B.en)+' '+da)+ROW(t('cbGaz'),'',nf(G.B.en)+' '+da)+ROW(t('tkAbo'),'',nf(abo)+' '+da);
+  rows+=ROW(t('tkHT'),'',nf(C.ht)+' '+da,'sub');
+  C.tvaRows.forEach(function(r){rows+=ROW(t('tkTVA',r.rate),'',nf(r.tva)+' '+da)});
+  C.tx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
+  rows+=ROW(t('tkTTC'),'',nf(C.total)+' '+da,'total');
+  var stamp=Math.ceil(C.total/100);
+  rows+=ROW(t('tkStamp'),'',nf(stamp)+' '+da,'mute')+ROW(t('tkCash'),'',nf(C.total+stamp)+' '+da,'mute');
+  $('#combo').innerHTML='<h2>'+t('cbTitle')+'</h2><p class="base">'+t('cbNote')+'</p><div class="rows">'+rows+'</div>'}
 
 function renderHist(){
   var u=S.tab,h=S.u[u].hist.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0}),d=MET[u].d;
@@ -545,7 +591,7 @@ function renderBar(){
   var u=S.tab,U=P(u),el=$('#barCard'),open=el.open,bu=BU[u];
   var g='<span class="hd"></span><span class="hd">'+t('bUpTo')+'</span><span class="hd">'+t('bPrice',bu)+'</span><span class="hd">'+t('bTva')+'</span>';
   U.tr.forEach(function(tr,i){g+='<span class="tn">'+t('bTr',i+1)+'</span><input id="b-lim-'+i+'" inputmode="decimal" value="'+(tr.lim==null?'':tr.lim)+'" '+(tr.lim==null?'disabled placeholder="'+t('bLast')+'"':'')+'><input id="b-price-'+i+'" inputmode="decimal" value="'+tr.price+'"><input id="b-tva-'+i+'" inputmode="decimal" value="'+tr.tva+'">'});
-  var spec={elec:[['fixed','power','bPower'],['fixed','perKwMonth','bPerKw'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
+  var spec={elec:[['fixed','power','bPower'],['fixed','perKwMonth','bPerKw'],['fixed','tvaFixed','bTvaFixed'],['th',null,'bTH'],['other',null,'bOther']],
             gaz:[['coef',null,'bCoef'],['fixed','perMonth','bPerMonth'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
             eau:[['fixed','perMonth','bFixeEau'],['fixed','tvaFixed','bTvaFixed'],['sanit',null,'bSanit'],['other',null,'bOther']]}[u];
   var pg=spec.map(function(sp,k){var v=sp[1]?U[sp[0]][sp[1]]:U[sp[0]];return '<label class="fld"><span>'+t(sp[2])+'</span><input id="b-p-'+k+'" inputmode="decimal" value="'+v+'"></label>'}).join('');
