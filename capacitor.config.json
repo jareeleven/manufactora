@@ -1,0 +1,6 @@
+{
+  "appId": "dz.kaddach.fatoura",
+  "appName": "Kaddach Fatoura",
+  "webDir": "www",
+  "android": { "backgroundColor": "#10232B" }
+}
