@@ -1,5 +1,5 @@
 /* Kaddach Fatoura : fonctionne hors ligne. Change CACHE quand tu modifies index.html. */
-const CACHE = 'kaddach-v2';
+const CACHE = 'kaddach-v3';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))).then(() => self.clients.claim())); });
@@ -12,4 +12,12 @@ self.addEventListener('fetch', e => {
     }
     return res;
   }).catch(() => caches.match('./index.html'))));
+});
+/* Clic sur une notification de rappel : ouvre ou ramène l'application. */
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    for (const c of list) { if ('focus' in c) return c.focus(); }
+    return self.clients.openWindow('./');
+  }));
 });

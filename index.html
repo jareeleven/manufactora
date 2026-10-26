@@ -204,6 +204,59 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:24px}
 .lightbox img{max-width:min(92vw,720px);max-height:82vh;border-radius:10px}
 @media (prefers-reduced-motion:reduce){.strip{transition:none}}
+
+/* ---- v3 : page unifiée, trimestres, bilan, rappels ---- */
+.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tab .tw{display:flex;gap:4px;align-items:center}
+.plate-title svg{width:22px;height:22px;fill:var(--accent);vertical-align:-3px;margin-inline-end:4px}
+.plate h3,.card h3.sech{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:17px;letter-spacing:.04em;text-transform:uppercase;margin:0}
+.card h3.sech{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.idxpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:18px;--dw:28px;--dh:44px}
+@media (max-width:540px){.idxpair{--dw:clamp(30px,10vw,40px);--dh:clamp(46px,14vw,58px)}}
+.idxcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.idxcol .drums{padding:8px 8px;gap:3px}
+.idxcol .plate-hint{min-height:2.6em}
+.idrow{display:flex;gap:8px;align-items:flex-end;margin-top:4px}
+.idrow .fld{flex:1}
+.btn.ico{padding:9px 11px}
+.dates-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:380px){.dates-grid{grid-template-columns:minmax(0,1fr)}}
+.fld select,.fld input[type=date]{font:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--plate2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0;width:100%}
+.alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:10px;background:var(--plate);border:1px solid var(--warn);border-inline-start-width:6px;color:var(--ink);font-weight:600}
+.alert svg{width:20px;height:20px;fill:var(--warn);flex:none;margin-top:2px}
+.ro-lines{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px}
+.ro-lines .ln{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:7px 0;border-bottom:1px dotted #33464e}
+.ro-lines .ln small{display:block;color:var(--panel-muted);font-size:12px}
+.ro-lines .ln b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.yrow{max-width:180px;margin:10px 0}
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+.qbtn{font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px;border:1px solid var(--line);border-radius:10px;background:var(--plate2);color:var(--ink);cursor:pointer;min-width:0;text-align:center}
+.qbtn b{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.qbtn .qn{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:23px;line-height:1.1;text-transform:uppercase}
+.qbtn small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.qbtn:hover:not(:disabled){border-color:var(--ink)}
+.qbtn.done{border-color:var(--ok);background:var(--plate)}
+.qbtn.done small{color:var(--ok);font-weight:700}
+.qbtn.sug{box-shadow:0 0 0 2px var(--accent)}
+.qbtn:disabled{opacity:.5;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.stat{background:var(--plate2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat span{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.stat b{display:block;font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:12px}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.bar{display:grid;grid-template-columns:78px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.bar .tk{height:14px;border-radius:4px;background:var(--plate2);border:1px solid var(--line);overflow:hidden;direction:ltr}
+.bar .tk i{display:block;height:100%;background:var(--accent)}
+.bar b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.an-msg{margin-top:8px}
+.rem{display:flex;flex-direction:column;gap:10px;padding:12px 0;border-bottom:1px dotted var(--line)}
+.rem:last-of-type{border-bottom:0}
+.rem p{font-size:14px}
+.stair-wrap{display:flex;flex-direction:column;gap:20px}
+details.card.ticket>summary{margin-bottom:0}
+details.card.ticket[open]>summary{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -221,42 +274,35 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
   </header>
 
   <div class="demo" id="demo" hidden><span id="demoTxt"></span><button type="button" id="demoBtn"></button></div>
+  <div class="alerts" id="alerts" role="region" aria-live="polite"></div>
 
   <nav class="tabs" id="tabs" role="tablist"></nav>
 
   <main class="grid">
     <section class="col">
-      <article class="plate" id="plateStart"></article>
-      <article class="plate" id="plateCur"></article>
+      <article class="plate" id="datesCard"></article>
+      <div class="col" id="blocks"></div>
     </section>
     <section class="col">
       <article class="readout" id="readout">
         <div class="ro-top"><span class="ro-label" id="roLabel"></span><span class="ro-pill" id="roPill"></span></div>
         <div class="ro-amount"><div class="odo" id="odo"></div><span class="ro-cur" id="roCur"></span></div>
-        <p class="ro-meta" id="roMeta"></p>
+        <div class="ro-lines" id="roLines"></div>
         <p class="ro-sub" id="roSub"></p>
         <p class="warn" id="roWarn" hidden></p>
-        <div class="ro-actions">
-          <button type="button" class="btn primary" id="btnSave"></button>
-          <button type="button" class="btn" id="btnNew"></button>
-          <span class="flash" id="flash" role="status"></span>
-        </div>
         <span class="sr" id="srAmount" aria-live="polite"></span>
       </article>
-      <article class="card" id="stairCard">
-        <h2 id="stTitle"></h2>
-        <p class="sub" id="stSub"></p>
-        <div id="stairHost"></div>
-        <div class="tips" id="tips"></div>
-      </article>
-      <article class="card ticket" id="ticket"></article>
+      <article class="card" id="saveCard"></article>
       <article class="card ticket" id="combo"></article>
     </section>
   </main>
 
   <section class="below">
+    <article class="card" id="recCard"></article>
+    <article class="card" id="alertCard"></article>
+    <div class="stair-wrap" id="stairs"></div>
+    <details class="card ticket" id="detCard"></details>
     <details class="card" id="calCard"></details>
-    <article class="card" id="histCard"></article>
     <details class="card" id="barCard"></details>
     <article class="card" id="srcCard"></article>
   </section>
@@ -267,7 +313,7 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 'use strict';
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-var DAYQ=91.25, KEY='kaddach.v2', UTILS=['elec','gaz','eau'];
+var DAYQ=91.25, KEY='kaddach.v3', OLD='kaddach.v2', UTILS=['elec','gaz','eau'];
 
 /* ---------- helpers ---------- */
 function ISO(d){var z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
@@ -361,23 +407,103 @@ Object.assign(I.ar,{demo:'هذه قيم تجريبية (فاتورة سونلغ�
  cbTitle:'فاتورة سونلغاز: كهرباء + غاز',cbNote:'مثل فاتورتك الورقية: مجموع واحد للطاقتين.',cbElec:'الكهرباء (المبلغ دون رسم)',cbGaz:'الغاز (المبلغ دون رسم)',
  bTH:'رسم السكن في الثلاثي (دج)',bCoef:'معامل PCS: ث حرارية لكل م³ (مكتوب في فاتورتك)',bPerKw:'الاشتراك لكل كيلواط شهريا (دج)',bPerMonth:'اشتراك الغاز شهريا (دج)',
  bNote:'أسعار الشرائح والرسم لكل شريحة والحق الثابت ومعامل الغاز: تم التحقق منها على فاتورة سونلغاز للثلاثي الرابع 2025. الاشتراك مبلغ مشترك بين الطاقتين وقد وزّعناه بين الكهرباء والغاز. رسم السكن يختلف حسب البلدية. تحقّق من هذه القيم في فاتورتك.'});
+
+/* ---- v3 texts ---- */
+Object.assign(I.fr,{
+ tag:"Ajoute tes index, vois ta facture avant qu'elle arrive, et garde tes 4 trimestres.",
+ tab_energie:'Électricité + Gaz',
+ dTitle:'Dates de relevé',dHintE:"Une seule facture couvre l'électricité et le gaz : mêmes dates pour les deux.",dHintW:'Dates de relevé de ton compteur d\'eau.',dStart:"Date de l'ancien relevé",dCur:'Date du nouveau relevé',
+ roLabelE:'Consommation électricité et gaz',roLabelW:"Consommation d'eau",roPill:'Estimation trimestre',
+ lnElec:'Électricité',lnGaz:'Gaz',lnEau:'Eau',qtyDays:'{0} · {1} jours',
+ roStamp:'Timbre {0} DA · en espèces {1} DA',
+ saveTitle:'Enregistrer ce relevé',saveHelpE:"Un seul bouton : choisis le trimestre et les index d'électricité et de gaz sont enregistrés ensemble.",saveHelpW:"Choisis le trimestre : les index et la consommation d'eau sont enregistrés.",
+ yearLbl:'Année',q1:'1er trimestre',q2:'2e trimestre',q3:'3e trimestre',q4:'4e trimestre',saveWord:'Enregistrer',qEmpty:'Vide',qSaved:'Enregistré · {0} DA',qSug:'en cours',
+ savedQ:'{0} {1} enregistré',updQ:'{0} {1} mis à jour',saveErr:"Impossible d'enregistrer : vérifie les index et les dates.",
+ repart:'Repartir de ces index (nouveau trimestre)',repartDone:'Nouveau point de départ enregistré',
+ recTitle:'Mes trimestres {0}',recLoad:'Charger',recDel:'Supprimer',recDelAsk:'Supprimer ce trimestre ?',recLineE:'{0} kWh · gaz {1} m³ · {2} DA',recLineW:'{0} m³ · {1} DA',
+ anBtn:"Calculer la consommation annuelle",anMissing:'Il manque : {0}',anReady:'Les 4 trimestres sont renseignés.',anTitle:'Bilan {0}',
+ anElec:"Électricité de l'année",anGaz:"Gaz de l'année",anEau:"Eau de l'année",anCost:'Total TTC de l\'année',anCash:'Avec timbres (espèces) : {0} DA',anAvg:'Moyenne par trimestre : {0} DA',anMax:'Trimestre le plus cher : {0}',anBars:'Montant par trimestre',
+ anThIs:'≈ {0} th',anElecCost:'Électricité : {0} DA',anGazCost:'Gaz : {0} DA',
+ cbTitleE:'Facture Sonelgaz : électricité + gaz',cbTitleW:"Facture d'eau",cbCalRow:'Réglage sur ta facture (× {0})',
+ detTitle:'Détail par tranche',
+ alTitle:'Rappel de facture',
+ alHelp:"Sonelgaz et l'ADE ne publient pas de calendrier fixe : la facture trimestrielle arrive environ 3 mois après la précédente, selon ton secteur de relevé. Indique la date de ta dernière facture : l'application calcule la semaine d'arrivée.",
+ alLast:'Dernière facture reçue ({0})',alNameE:'électricité + gaz',alNameW:'eau',alNameEs:"d'électricité et de gaz",alNameWs:"d'eau",
+ alLead:'Me prévenir',alDays:'{0} jours avant',
+ alNext:'Prochaine facture attendue : semaine du {0} au {1}.',alNone:'Entre la date de ta dernière facture pour activer le rappel.',
+ alSoon:'Ta facture {0} ne va pas tarder : attendue la semaine du {1} au {2}. Pense à relever ton index.',alNow:'Ta facture {0} est attendue cette semaine ({1} au {2}). Relève ton index maintenant.',
+ alNotif:'Activer les notifications',alNotifOn:'Notifications activées',alNotifNo:'Notifications bloquées par le navigateur',alNotifNA:'Ce navigateur ne gère pas les notifications',
+ alIcs:'Ajouter les rappels à mon calendrier',alIcsNone:"Renseigne d'abord une date de dernière facture.",
+ alNote:"Les notifications apparaissent quand tu ouvres l'application. Pour être prévenu même application fermée, ajoute les rappels à ton calendrier (ils se répètent tous les 3 mois).",
+ icsTitle:'Facture {0} attendue',icsDesc:"Relève ton index et vérifie ta facture avec l'application Kaddach Fatoura.",
+ calHelpE:"Entre les consommations et le « Net à payer TTC » de ta dernière facture Sonelgaz : l'estimation s'ajuste à tes taxes réelles.",calConsE:'Électricité facturée (kWh)',calConsG:'Gaz facturé (m³)',calPaid:'Net à payer TTC (DA)',
+ b_elec:'Électricité',b_gaz:'Gaz',b_eau:'Eau'
+});
+Object.assign(I.ar,{
+ tag:'أدخل مؤشراتك، شاهد فاتورتك قبل وصولها، واحتفظ بثلاثياتك الأربعة.',
+ tab_energie:'الكهرباء + الغاز',
+ dTitle:'تواريخ القراءة',dHintE:'فاتورة واحدة تشمل الكهرباء والغاز: نفس التواريخ للاثنين.',dHintW:'تواريخ قراءة عدّاد الماء.',dStart:'تاريخ القراءة القديمة',dCur:'تاريخ القراءة الجديدة',
+ roLabelE:'استهلاك الكهرباء والغاز',roLabelW:'استهلاك الماء',roPill:'تقدير الثلاثي',
+ lnElec:'الكهرباء',lnGaz:'الغاز',lnEau:'الماء',qtyDays:'{0} · {1} يوم',
+ roStamp:'الطابع {0} دج · الدفع نقدا {1} دج',
+ saveTitle:'سجّل هذه القراءة',saveHelpE:'زرّ واحد: اختر الثلاثي فتُسجَّل مؤشرات الكهرباء والغاز معا.',saveHelpW:'اختر الثلاثي فتُسجَّل المؤشرات واستهلاك الماء.',
+ yearLbl:'السنة',q1:'الثلاثي الأول',q2:'الثلاثي الثاني',q3:'الثلاثي الثالث',q4:'الثلاثي الرابع',saveWord:'تسجيل',qEmpty:'فارغ',qSaved:'مسجّل · {0} دج',qSug:'الحالي',
+ savedQ:'تم تسجيل {0} {1}',updQ:'تم تحديث {0} {1}',saveErr:'تعذّر التسجيل: تحقّق من المؤشرات والتواريخ.',
+ repart:'ابدأ من هذه المؤشرات (ثلاثي جديد)',repartDone:'تم تسجيل نقطة البداية الجديدة',
+ recTitle:'ثلاثياتي {0}',recLoad:'تحميل',recDel:'حذف',recDelAsk:'حذف هذا الثلاثي؟',recLineE:'{0} كيلواط ساعي · غاز {1} م³ · {2} دج',recLineW:'{0} م³ · {1} دج',
+ anBtn:'احسب الاستهلاك السنوي',anMissing:'ينقص: {0}',anReady:'الثلاثيات الأربعة مكتملة.',anTitle:'حصيلة {0}',
+ anElec:'كهرباء السنة',anGaz:'غاز السنة',anEau:'ماء السنة',anCost:'المجموع السنوي بجميع الرسوم',anCash:'مع الطوابع (نقدا): {0} دج',anAvg:'المعدّل في الثلاثي: {0} دج',anMax:'الثلاثي الأغلى: {0}',anBars:'المبلغ في كل ثلاثي',
+ anThIs:'≈ {0} ث',anElecCost:'الكهرباء: {0} دج',anGazCost:'الغاز: {0} دج',
+ cbTitleE:'فاتورة سونلغاز: كهرباء + غاز',cbTitleW:'فاتورة الماء',cbCalRow:'الضبط على فاتورتك (× {0})',
+ detTitle:'التفصيل حسب الشرائح',
+ alTitle:'تذكير بالفاتورة',
+ alHelp:'سونلغاز والجزائرية للمياه لا تنشران جدولا ثابتا: الفاتورة الثلاثية تصل بعد حوالي 3 أشهر من السابقة حسب قطاع القراءة. أدخل تاريخ آخر فاتورة فيحسب التطبيق أسبوع الوصول.',
+ alLast:'آخر فاتورة وصلتني ({0})',alNameE:'كهرباء + غاز',alNameW:'ماء',alNameEs:'الكهرباء والغاز',alNameWs:'الماء',
+ alLead:'نبّهني',alDays:'قبل {0} أيام',
+ alNext:'الفاتورة المقبلة متوقعة: أسبوع {0} إلى {1}.',alNone:'أدخل تاريخ آخر فاتورة لتفعيل التذكير.',
+ alSoon:'فاتورة {0} على وشك الوصول: متوقعة أسبوع {1} إلى {2}. لا تنس قراءة العدّاد.',alNow:'فاتورة {0} متوقعة هذا الأسبوع ({1} إلى {2}). اقرأ العدّاد الآن.',
+ alNotif:'تفعيل الإشعارات',alNotifOn:'الإشعارات مفعّلة',alNotifNo:'الإشعارات محظورة في المتصفح',alNotifNA:'هذا المتصفح لا يدعم الإشعارات',
+ alIcs:'أضف التذكيرات إلى تقويمي',alIcsNone:'أدخل أولا تاريخ آخر فاتورة.',
+ alNote:'تظهر الإشعارات عند فتح التطبيق. للتنبيه والتطبيق مغلق، أضف التذكيرات إلى تقويمك (تتكرر كل 3 أشهر).',
+ icsTitle:'فاتورة {0} متوقعة',icsDesc:'اقرأ العدّاد وراجع فاتورتك مع تطبيق قداش الفاتورة.',
+ calHelpE:'أدخل الاستهلاك و«الصافي للدفع» في آخر فاتورة سونلغاز: يُعدَّل التقدير حسب رسومك الفعلية.',calConsE:'الكهرباء المفوترة (كيلواط ساعي)',calConsG:'الغاز المفوتر (م³)',calPaid:'الصافي للدفع بجميع الرسوم (دج)',
+ b_elec:'الكهرباء',b_gaz:'الغاز',b_eau:'الماء'
+});
 function t(k){var a=arguments,s=(I[S.lang]&&I[S.lang][k]);if(s==null)s=I.fr[k];if(s==null)return k;
   return String(s).replace(/\{(\d)\}/g,function(_,i){var v=a[+i+1];return v==null?'':v})}
 
+function addMonths(iso,n){var d=new Date(iso+'T12:00:00'),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);var dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,dim));return ISO(d)}
+function fdate(iso){return new Date(iso+'T12:00:00').toLocaleDateString(S.lang==='ar'?'ar-DZ':'fr-FR',{day:'numeric',month:'long'})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
 /* ---------- state ---------- */
-function mk(a,b,sd,cd){return {start:{idx:a,date:sd},cur:{idx:b,date:cd},photo:{start:null,cur:null},hist:[],cal:null,p:null}}
+var PAGE={elec:'energie',gaz:'energie',eau:'eau'}, PU={energie:['elec','gaz'],eau:['eau']}, PAGES=['energie','eau'];
+function mkU(a,b){return {start:{idx:a},cur:{idx:b},photo:{start:null,cur:null},p:null}}
 function seed(){var d=today(),s=addDays(d,-91);
-  return {v:1,lang:'fr',tab:'elec',demo:true,u:{elec:mk(28683,29403,s,d),gaz:mk(7365,7425,s,d),eau:mk(3210,3241.2,s,d)}}}
-function load(){var s=null;try{var r=localStorage.getItem(KEY);if(r)s=JSON.parse(r)}catch(e){}
-  if(!s||!s.u||!s.u.elec||!s.u.gaz||!s.u.eau)s=seed();
-  UTILS.forEach(function(u){s.u[u].cur.date=today();s.u[u].photo=s.u[u].photo||{start:null,cur:null};s.u[u].hist=s.u[u].hist||[]});
-  if(!I[s.lang])s.lang='fr';return s}
+  return {v:3,lang:'fr',tab:'energie',demo:true,year:new Date().getFullYear(),
+    dates:{energie:{start:s,cur:d},eau:{start:s,cur:d}},
+    u:{elec:mkU(28683,29403),gaz:mkU(7365,7425),eau:mkU(3210,3241.2)},
+    cal:{energie:null,eau:null},q:{energie:{},eau:{}},
+    alert:{lead:7,last:{energie:'',eau:''},notif:false,sent:{}}}}
+function migrate(o){var s=seed();s.demo=!!o.demo;s.lang=o.lang||'fr';s.tab=o.tab==='eau'?'eau':'energie';
+  UTILS.forEach(function(u){var x=o.u[u];s.u[u]={start:{idx:x.start.idx||0},cur:{idx:x.cur.idx||0},photo:x.photo||{start:null,cur:null},p:x.p||null}});
+  s.dates.energie.start=o.u.elec.start.date||s.dates.energie.start;s.dates.eau.start=o.u.eau.start.date||s.dates.eau.start;return s}
+function load(){var s=null,r,o=null;
+  try{r=localStorage.getItem(KEY);if(r)s=JSON.parse(r)}catch(e){}
+  if(!s||s.v!==3||!s.u||!s.dates){
+    try{r=localStorage.getItem(OLD);if(r)o=JSON.parse(r)}catch(e){}
+    s=(o&&o.u&&o.u.elec&&o.u.gaz&&o.u.eau)?migrate(o):seed()}
+  var d=seed();
+  ['cal','q','alert'].forEach(function(k){if(!s[k])s[k]=d[k]});
+  PAGES.forEach(function(p){if(!s.q[p])s.q[p]={};if(s.cal[p]===undefined)s.cal[p]=null;if(!s.alert.last)s.alert.last={energie:'',eau:''};if(s.alert.last[p]==null)s.alert.last[p]='';s.dates[p].cur=today();if(!s.dates[p].start)s.dates[p].start=addDays(today(),-91)});
+  if(!s.alert.sent)s.alert.sent={};
+  UTILS.forEach(function(u){s.u[u].photo=s.u[u].photo||{start:null,cur:null}});
+  if(!I[s.lang])s.lang='fr';if(s.tab!=='eau')s.tab='energie';if(!s.year)s.year=new Date().getFullYear();return s}
 var S=load();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){try{var c=clone(S);UTILS.forEach(function(u){c.u[u].photo={start:null,cur:null};c.u[u].hist.forEach(function(h){h.photo=null})});localStorage.setItem(KEY,JSON.stringify(c))}catch(e2){}}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){try{var c=clone(S);UTILS.forEach(function(u){c.u[u].photo={start:null,cur:null}});localStorage.setItem(KEY,JSON.stringify(c))}catch(e2){}}}
 function P(u){return S.u[u].p||DEF[u]}
 function editP(u){if(!S.u[u].p)S.u[u].p=clone(DEF[u]);return S.u[u].p}
 function touch(){if(S.demo){S.demo=false;$('#demo').hidden=true;$$('.demo-tag').forEach(function(e){e.hidden=true})}}
-
 /* ---------- billing engine ---------- */
 function levy(q){return q<70?0:q<=190?25:q<=390?100:200}
 function r2(x){return Math.round(x*100+1e-9)/100}
@@ -452,52 +578,74 @@ function Meter(host,nInt,nDec,onChange,label){
     })(p)}
   return {set:function(v,animate){render(clamp(Math.round(v*Math.pow(10,nDec)),0,max),animate)}}}
 
+/* ---------- calculs par page ---------- */
+function calcU(u){
+  var pg=PAGE[u],D=S.dates[pg],st=S.u[u],U=P(u);
+  var consM=Math.max(0,(st.cur.idx||0)-(st.start.idx||0)),neg=(st.cur.idx||0)<(st.start.idx||0);
+  var cons=u==='gaz'?consM*U.coef:consM,days=daysBetween(D.start,D.cur),ok=days>=1;
+  var rate=ok?cons/days:0,Qc=ok?(Math.abs(days-DAYQ)<4?cons:rate*DAYQ):0;
+  return {u:u,U:U,consM:consM,neg:neg,cons:cons,days:days,ok:ok,rate:rate,Qc:Qc,B:bill(u,U,Qc)}}
+function calcPage(pg){
+  var parts=PU[pg].map(calcU),C=parts.length>1?combine(parts[0].B,parts[1].B):parts[0].B;
+  var f=S.cal[pg]&&S.cal[pg].f?S.cal[pg].f:1,total=r2(C.total*f),stamp=Math.ceil(total/100);
+  return {pg:pg,parts:parts,C:C,f:f,total:total,stamp:stamp,cash:r2(total+stamp),ok:parts[0].ok,neg:parts.some(function(p){return p.neg}),days:parts[0].days}}
+function makeRecord(pg){
+  var c=calcPage(pg),D=S.dates[pg],r={saved:today(),d0:D.start,d1:D.cur,days:c.days,tot:c.total,stamp:c.stamp,f:c.f};
+  if(pg==='energie'){var E=c.parts[0],G=c.parts[1];
+    r.i={e0:S.u.elec.start.idx,e1:S.u.elec.cur.idx,g0:S.u.gaz.start.idx,g1:S.u.gaz.cur.idx};
+    r.c={kwh:E.consM,gm3:G.consM,gth:G.cons};r.totE=r2(E.B.total*c.f);r.totG=r2(G.B.total*c.f)}
+  else{var W=c.parts[0];r.i={w0:S.u.eau.start.idx,w1:S.u.eau.cur.idx};r.c={m3:W.consM};r.totW=c.total}
+  return r}
+function recs(pg,y){var Y=S.q[pg][y]||{};return [1,2,3,4].map(function(n){return Y[n]||null})}
+
 /* ---------- UI ---------- */
-var meters={},odo=null,lastU=null;
+var meters={},odo=null,anOpen={};
 function fmtIdx(v,d){return d?Number(v).toFixed(d).replace('.',','):String(Math.round(v))}
+function pgName(pg,short){return t(pg==='eau'?(short?'alNameWs':'alNameW'):(short?'alNameEs':'alNameE'))}
+var BELL='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2.500 2.500 0 0 0 2.400-2h-4.800A2.500 2.500 0 0 0 12 22zm7-6v-5a7 7 0 0 0-5.500-6.800V3.500a1.500 1.500 0 0 0-3 0v.7A7 7 0 0 0 5 11v5l-2 2v1h18v-1z"/></svg>';
 
 function renderStatic(){
-  var app=$('#app');app.lang=S.lang;app.dir=S.lang==='ar'?'rtl':'ltr';app.dataset.util=S.tab;
+  var pg=S.tab,app=$('#app');app.lang=S.lang;app.dir=S.lang==='ar'?'rtl':'ltr';app.dataset.util=pg==='eau'?'eau':'elec';
   $('#tName').textContent=t('name');$('#tTag').textContent=t('tag');
   $$('.lang button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.lang===S.lang?'true':'false')});
   $('#demo').hidden=!S.demo;$('#demoTxt').textContent=t('demo');$('#demoBtn').textContent=t('demoBtn');
-  $('#tabs').innerHTML=UTILS.map(function(u){return '<button type="button" class="tab" role="tab" data-u="'+u+'" aria-selected="'+(u===S.tab)+'">'+ICON[u]+'<span>'+t('tab_'+u)+'</span></button>'}).join('');
-  $('#roLabel').textContent=t('roLabel');$('#roCur').textContent=t('da');
-  $('#btnSave').textContent=t('save');$('#btnNew').textContent=t('newBill');
-  $('#stTitle').textContent=t('stTitle');$('#stSub').textContent=t('stSub');$('#disc').textContent=t('disc');
-  document.title=t('name')}
+  $('#tabs').innerHTML=PAGES.map(function(p){return '<button type="button" class="tab" role="tab" data-u="'+(p==='eau'?'eau':'elec')+'" data-pg="'+p+'" aria-selected="'+(p===pg)+'"><span class="tw">'+(p==='eau'?ICON.eau:ICON.elec+ICON.gaz)+'</span><span>'+t(p==='eau'?'tab_eau':'tab_energie')+'</span></button>'}).join('');
+  $('#roLabel').textContent=t(pg==='eau'?'roLabelW':'roLabelE');$('#roPill').textContent=t('roPill');$('#roCur').textContent=t('da');
+  $('#disc').textContent=t('disc');document.title=t('name')}
 
-function plateHTML(which){
-  var u=S.tab,d=MET[u].d;
-  var q=which==='start'?'<div class="quick"><span>'+t('ago')+'</span><button type="button" class="chip" data-ago="30">'+t('m1')+'</button><button type="button" class="chip" data-ago="61">'+t('m2')+'</button><button type="button" class="chip" data-ago="91">'+t('m3')+'</button></div>':'';
-  return '<div class="plate-head"><div><h2 class="plate-title">'+t(which==='start'?'pStart':'pCur')+'</h2><p class="plate-hint">'+t(which==='start'?'hStart':'hCur')+'</p></div><span class="tag demo-tag"'+(S.demo?'':' hidden')+'>'+t('example')+'</span></div>'+
-  '<div data-host="'+which+'"></div>'+
-  '<div class="meter-unit"><b>'+MU[u]+'</b><span>'+t('drumHelp')+'</span></div>'+
-  '<div class="fields"><label class="fld"><span>'+t('typeIdx')+'</span><input id="'+which+'-idx" inputmode="decimal" autocomplete="off"></label>'+
-  '<label class="fld"><span>'+t('dateOn')+'</span><input type="date" id="'+which+'-date"></label></div>'+q+
-  '<div class="photo-row"><button type="button" class="btn" data-photo="'+which+'">'+CAM+'<span>'+t('photo')+'</span></button><input type="file" accept="image/*" capture="environment" hidden id="'+which+'-file"><span id="'+which+'-thumb"></span></div>'}
+function blockHTML(u){
+  function side(which){var k=u+'-'+which;
+    return '<div class="idxcol"><h3>'+t(which==='start'?'pStart':'pCur')+'</h3><p class="plate-hint">'+t(which==='start'?'hStart':'hCur')+'</p><div data-host="'+u+':'+which+'"></div>'+
+    '<div class="idrow"><label class="fld"><span>'+t('typeIdx')+' ('+MU[u]+')</span><input id="'+k+'-idx" inputmode="decimal" autocomplete="off"></label><button type="button" class="btn ico" data-photo="'+u+':'+which+'" aria-label="'+t('photo')+'">'+CAM+'</button></div>'+
+    '<div id="'+k+'-thumb"></div><input type="file" accept="image/*" capture="environment" hidden id="'+k+'-file"></div>'}
+  return '<article class="plate" data-uu="'+u+'" style="--accent:var(--'+u+')"><div class="plate-head"><h2 class="plate-title">'+ICON[u]+t('b_'+u)+'</h2><span class="tag demo-tag"'+(S.demo?'':' hidden')+'>'+t('example')+'</span></div><div class="idxpair">'+side('start')+side('cur')+'</div><p class="plate-hint" style="margin-top:10px">'+t('drumHelp')+'</p></article>'}
 
-function renderThumb(which){
-  var host=$('#'+which+'-thumb'),src=S.u[S.tab].photo[which];if(!host)return;
+function renderThumb(u,which){
+  var host=$('#'+u+'-'+which+'-thumb'),src=S.u[u].photo[which];if(!host)return;
   if(!src){host.innerHTML='';return}
-  host.innerHTML='<span class="thumb-box"><button type="button" class="thumb" data-zoom="'+which+'"><img alt="" src="'+src+'"></button><button type="button" class="thumb-x" data-unphoto="'+which+'" aria-label="'+t('photoDel')+'">×</button></span>'}
+  host.innerHTML='<span class="thumb-box"><button type="button" class="thumb" data-zoom="'+u+':'+which+'"><img alt="" src="'+src+'"></button><button type="button" class="thumb-x" data-unphoto="'+u+':'+which+'" aria-label="'+t('photoDel')+'">×</button></span>'}
 
-function renderPlates(){
-  var u=S.tab,cfg=MET[u];
-  ['start','cur'].forEach(function(which){
-    var el=$(which==='start'?'#plateStart':'#plateCur');el.innerHTML=plateHTML(which);
-    var st=S.u[u][which];
-    var m=Meter($('[data-host="'+which+'"]',el),cfg.n-cfg.d,cfg.d,function(v){st.idx=v;touch();$('#'+which+'-idx').value=fmtIdx(v,cfg.d);recompute();save()},t('typeIdx'));
-    meters[which]=m;m.set(st.idx||0,false);
-    var inp=$('#'+which+'-idx');inp.value=fmtIdx(st.idx||0,cfg.d);
-    inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;st.idx=v;touch();m.set(v,true);recompute();save()});
-    var di=$('#'+which+'-date');di.value=st.date;
-    di.addEventListener('change',function(){if(di.value){st.date=di.value;touch();recompute();save()}});
-    var btn=$('[data-photo="'+which+'"]',el),file=$('#'+which+'-file');
-    btn.addEventListener('click',function(){file.click()});
-    file.addEventListener('change',function(){var f=file.files&&file.files[0];if(!f)return;readPhoto(f,function(src){S.u[u].photo[which]=src;touch();renderThumb(which);save()});file.value=''});
-    renderThumb(which)});
-  $$('[data-ago]').forEach(function(b){b.addEventListener('click',function(){var st=S.u[u];st.start.date=addDays(st.cur.date,-Number(b.dataset.ago));$('#start-date').value=st.start.date;touch();recompute();save()})})}
+function renderIdx(){
+  var pg=S.tab,D=S.dates[pg],us=PU[pg];
+  $('#datesCard').innerHTML='<div class="plate-head"><div><h2 class="plate-title">'+t('dTitle')+'</h2><p class="plate-hint">'+t(pg==='eau'?'dHintW':'dHintE')+'</p></div></div>'+
+   '<div class="dates-grid"><label class="fld"><span>'+t('dStart')+'</span><input type="date" id="d-start"></label><label class="fld"><span>'+t('dCur')+'</span><input type="date" id="d-cur"></label></div>'+
+   '<div class="quick"><span>'+t('ago')+'</span><button type="button" class="chip" data-ago="30">'+t('m1')+'</button><button type="button" class="chip" data-ago="61">'+t('m2')+'</button><button type="button" class="chip" data-ago="91">'+t('m3')+'</button></div>';
+  $('#d-start').value=D.start;$('#d-cur').value=D.cur;
+  ['start','cur'].forEach(function(w){var k=w==='start'?'#d-start':'#d-cur',el=$(k);el.addEventListener('change',function(){if(el.value){D[w]=el.value;touch();recompute();save()}})});
+  $$('[data-ago]').forEach(function(b){b.addEventListener('click',function(){D.start=addDays(D.cur,-Number(b.dataset.ago));$('#d-start').value=D.start;touch();recompute();save()})});
+  $('#blocks').innerHTML=us.map(blockHTML).join('');
+  meters={};
+  us.forEach(function(u){var cfg=MET[u];
+    ['start','cur'].forEach(function(which){
+      var st=S.u[u][which],k=u+'-'+which,host=$('[data-host="'+u+':'+which+'"]');
+      var m=Meter(host,cfg.n-cfg.d,cfg.d,function(v){st.idx=v;touch();$('#'+k+'-idx').value=fmtIdx(v,cfg.d);recompute();save()},t('b_'+u)+' '+t('typeIdx'));
+      meters[u+':'+which]=m;m.set(st.idx||0,false);
+      var inp=$('#'+k+'-idx');inp.value=fmtIdx(st.idx||0,cfg.d);
+      inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;st.idx=v;touch();m.set(v,true);recompute();save()});
+      var btn=$('[data-photo="'+u+':'+which+'"]'),file=$('#'+k+'-file');
+      btn.addEventListener('click',function(){file.click()});
+      file.addEventListener('change',function(){var f=file.files&&file.files[0];if(!f)return;readPhoto(f,function(src){S.u[u].photo[which]=src;touch();renderThumb(u,which);save()});file.value=''});
+      renderThumb(u,which)})})}
 
 function readPhoto(file,cb){var r=new FileReader();r.onload=function(){var img=new Image();img.onload=function(){var mx=320,sc=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.62))};img.src=r.result};r.readAsDataURL(file)}
 
@@ -522,86 +670,123 @@ function stairSVG(U,Qc,unit){
 
 var ROW=function(label,small,val,cls){return '<div class="row'+(cls?' '+cls:'')+'"><span>'+label+(small?'<small>'+small+'</small>':'')+'</span><b>'+val+'</b></div>'};
 
-function calc(u){
-  var st=S.u[u],U=P(u);
-  var consM=Math.max(0,(st.cur.idx||0)-(st.start.idx||0)),neg=(st.cur.idx||0)<(st.start.idx||0);
-  var cons=u==='gaz'?consM*U.coef:consM,days=daysBetween(st.start.date,st.cur.date),ok=days>=1;
-  var rate=ok?cons/days:0,Qc=ok?(Math.abs(days-DAYQ)<4?cons:rate*DAYQ):0;
-  var B=bill(u,U,Qc),f=st.cal&&st.cal.on?st.cal.f:1;
-  return {u:u,st:st,U:U,consM:consM,neg:neg,cons:cons,days:days,ok:ok,rate:rate,Qc:Qc,B:B,f:f,total:r2(B.total*f)}}
+function tipsFor(p,f){
+  var U=p.U,B=p.B,bu=BU[p.u],Qc=p.Qc,tips=[],i=B.idx,last=i===U.tr.length-1;
+  tips.push(t('tipIn',i+1,nf(U.tr[i].price,U.tr[i].price<1?4:2),bu));
+  if(!last){var up=(U.tr[i+1].price/U.tr[i].price-1)*100;tips.push(t('tipMargin',i+2,nf(up,0),nf(Math.max(0,U.tr[i].lim-Qc),bu==='m³'?1:0),bu))}
+  else tips.push(t('tipLast'));
+  if(i>0){var tgt=U.tr[i-1].lim,sv=(B.total-bill(p.u,U,tgt).total)*f;if(sv>=1)tips.push(t('tipSave',nf(tgt,0),bu,nf(sv,0)))}
+  return tips}
 
 function recompute(){
-  var u=S.tab,c=calc(u),U=c.U,B=c.B,f=c.f,total=c.total,ok=c.ok,days=c.days,Qc=c.Qc,bu=BU[u],da=t('da');
-  var sofar=ok?total*(Math.min(days,DAYQ)/DAYQ):0;
-  odo.set(ok?total:0);
-  $('#srAmount').textContent=ok?nf(total,0)+' '+da:'';
-  $('#roPill').textContent=ok?t('tranche',B.idx+1):'—';
-  var meta=u==='gaz'?t('metaG',nf(c.consM,1),nf(c.cons,0),days,nf(c.rate,1)):t('metaA',nf(c.cons,u==='eau'?1:0),bu,days,nf(c.rate,u==='eau'?2:1));
-  $('#roMeta').textContent=ok?meta:'';
-  $('#roSub').textContent=(ok&&Math.abs(days-DAYQ)>=4)?t('soFar',nf(sofar,0))+(f!==1?'  ·  '+t('calOn',nf(f,3)):''):(ok&&f!==1?t('calOn',nf(f,3)):'');
+  var pg=S.tab,c=calcPage(pg),da=t('da'),ok=c.ok;
+  odo.set(ok?c.total:0);
+  $('#srAmount').textContent=ok?nf(c.total,0)+' '+da:'';
+  var L='';
+  if(ok)c.parts.forEach(function(p){var qty=p.u==='gaz'?nf(p.consM,1)+' m³ (≈ '+nf(p.cons,0)+' th)':nf(p.consM,p.u==='eau'?1:0)+' '+BU[p.u];
+    L+='<div class="ln"><span>'+t(p.u==='elec'?'lnElec':p.u==='gaz'?'lnGaz':'lnEau')+'<small>'+t('qtyDays',qty,p.days)+'</small></span><b>'+nf(r2(p.B.total*c.f))+' '+da+'</b></div>'});
+  $('#roLines').innerHTML=L;
+  var sofar=ok?c.total*(Math.min(c.days,DAYQ)/DAYQ):0,sub=ok?t('roStamp',nf(c.stamp),nf(c.cash)):'';
+  if(ok&&Math.abs(c.days-DAYQ)>=4)sub+='  ·  '+t('soFar',nf(sofar,0));
+  if(ok&&c.f!==1)sub+='  ·  '+t('calOn',nf(c.f,3));
+  $('#roSub').textContent=sub;
   var w=$('#roWarn');if(c.neg){w.textContent=t('warnNeg');w.hidden=false}else if(!ok){w.textContent=t('warnDays');w.hidden=false}else w.hidden=true;
 
-  $('#stairHost').innerHTML=stairSVG(U,Qc,bu);
-  var tips=[];
-  if(ok){
-    var i=B.idx,last=i===U.tr.length-1;
-    tips.push(t('tipIn',i+1,nf(U.tr[i].price,U.tr[i].price<1?4:2),bu));
-    if(!last){var up=(U.tr[i+1].price/U.tr[i].price-1)*100;tips.push(t('tipMargin',i+2,nf(up,0),nf(Math.max(0,U.tr[i].lim-Qc),bu==='m³'?1:0),bu))}
-    else tips.push(t('tipLast'));
-    if(i>0){var tgt=U.tr[i-1].lim,sv=(B.total-bill(u,U,tgt).total)*f;if(sv>=1)tips.push(t('tipSave',nf(tgt,0),bu,nf(sv,0)))}}
-  $('#tips').innerHTML=tips.map(function(x){return '<p>'+x+'</p>'}).join('');
+  /* barème + conseils par énergie */
+  $('#stairs').innerHTML=c.parts.map(function(p){
+    var tips=ok?tipsFor(p,c.f):[];
+    return '<article class="card" style="--accent:var(--'+p.u+')"><h2>'+t('stTitle')+' · '+t('b_'+p.u)+'</h2><p class="sub">'+t('stSub')+'</p>'+stairSVG(p.U,p.Qc,BU[p.u])+'<div class="tips">'+tips.map(function(x){return '<p>'+x+'</p>'}).join('')+'</div></article>'}).join('');
 
-  var rows='';
-  B.lines.forEach(function(l){rows+=ROW(t('tkTr',l.i+1),nf(l.q,bu==='m³'?1:0)+' '+bu+' × '+nf(l.price,l.price<1?4:2),nf(l.amt)+' '+da)});
-  B.fx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
-  rows+=ROW(t('tkHT'),'',nf(B.ht)+' '+da,'sub');
-  B.tvaRows.forEach(function(r){rows+=ROW(t('tkTVA',r.rate),'',nf(r.tva)+' '+da)});
-  B.tx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
-  if(f!==1)rows+=ROW(t('tkCal',nf(f,3)),'',(f>1?'+':'−')+nf(Math.abs(B.total*(f-1)))+' '+da);
-  rows+=ROW(t('tkTTC'),'',nf(total)+' '+da,'total');
-  var stamp=Math.ceil(total/100);
-  rows+=ROW(t('tkStamp'),'',nf(stamp)+' '+da,'mute')+ROW(t('tkCash'),'',nf(total+stamp)+' '+da,'mute');
-  $('#ticket').innerHTML='<h2>'+t('tkTitle')+'</h2><p class="base">'+t('tkBase',nf(Qc,bu==='m³'?1:0),bu)+'</p><div class="rows">'+(ok?rows:'')+'</div>';
-  renderCombo()}
-
-function renderCombo(){
-  var E=calc('elec'),G=calc('gaz'),C=combine(E.B,G.B),da=t('da'),rows='',abo=0;
-  C.fx.forEach(function(x){abo+=x.amt});
-  rows+=ROW(t('cbElec'),'',nf(E.B.en)+' '+da)+ROW(t('cbGaz'),'',nf(G.B.en)+' '+da)+ROW(t('tkAbo'),'',nf(abo)+' '+da);
+  /* ticket principal, comme sur la facture papier */
+  var rows='',C=c.C;
+  if(pg==='energie'){
+    var abo=0;C.fx.forEach(function(x){abo+=x.amt});
+    rows+=ROW(t('cbElec'),'',nf(c.parts[0].B.en)+' '+da)+ROW(t('cbGaz'),'',nf(c.parts[1].B.en)+' '+da)+ROW(t('tkAbo'),'',nf(abo)+' '+da)}
+  else{
+    C.lines.forEach(function(l){rows+=ROW(t('tkTr',l.i+1),nf(l.q,1)+' m³ × '+nf(l.price,2),nf(l.amt)+' '+da)});
+    C.fx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)})}
   rows+=ROW(t('tkHT'),'',nf(C.ht)+' '+da,'sub');
   C.tvaRows.forEach(function(r){rows+=ROW(t('tkTVA',r.rate),'',nf(r.tva)+' '+da)});
   C.tx.forEach(function(x){rows+=ROW(t.apply(null,[x.key].concat(x.args)),'',nf(x.amt)+' '+da)});
-  rows+=ROW(t('tkTTC'),'',nf(C.total)+' '+da,'total');
-  var stamp=Math.ceil(C.total/100);
-  rows+=ROW(t('tkStamp'),'',nf(stamp)+' '+da,'mute')+ROW(t('tkCash'),'',nf(C.total+stamp)+' '+da,'mute');
-  $('#combo').innerHTML='<h2>'+t('cbTitle')+'</h2><p class="base">'+t('cbNote')+'</p><div class="rows">'+rows+'</div>'}
+  if(c.f!==1)rows+=ROW(t('cbCalRow',nf(c.f,3)),'',(c.f>1?'+':'−')+nf(Math.abs(c.total-C.total))+' '+da);
+  rows+=ROW(t('tkTTC'),'',nf(c.total)+' '+da,'total')+ROW(t('tkStamp'),'',nf(c.stamp)+' '+da,'mute')+ROW(t('tkCash'),'',nf(c.cash)+' '+da,'mute');
+  $('#combo').innerHTML='<h2>'+t(pg==='eau'?'cbTitleW':'cbTitleE')+'</h2>'+(pg==='energie'?'<p class="base">'+t('cbNote')+'</p>':'')+'<div class="rows">'+(ok?rows:'')+'</div>';
 
-function renderHist(){
-  var u=S.tab,h=S.u[u].hist.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0}),d=MET[u].d;
-  var li=h.length?h.map(function(e,k){var prev=h[k+1],delta=prev?Math.max(0,e.idx-prev.idx):null;
-    return '<li><div class="h-main"><b>'+e.date+' · '+fmtIdx(e.idx,d)+' '+MU[u]+'</b>'+(delta!=null?'<small>'+t('histDelta',nf(delta,d?1:0),MU[u])+'</small>':'')+'</div><div class="h-act"><button type="button" class="mini" data-use="'+e.id+'">'+t('histUse')+'</button><button type="button" class="mini" data-del="'+e.id+'">'+t('histDel')+'</button></div></li>'}).join(''):'<li class="hint">'+t('histEmpty')+'</li>';
-  $('#histCard').innerHTML='<h2>'+t('histTitle')+'</h2><ul class="hist" style="margin-top:8px">'+li+'</ul>'}
+  /* détail par tranche */
+  var d=$('#detCard'),open=d.open,dh='';
+  c.parts.forEach(function(p){var bu=BU[p.u],r='';
+    p.B.lines.forEach(function(l){r+=ROW(t('tkTr',l.i+1),nf(l.q,bu==='m³'?1:0)+' '+bu+' × '+nf(l.price,l.price<1?4:2),nf(l.amt)+' '+da)});
+    dh+=(c.parts.length>1?'<h3 class="sech">'+t('b_'+p.u)+'</h3>':'')+'<p class="base">'+t('tkBase',nf(p.Qc,bu==='m³'?1:0),bu)+'</p><div class="rows">'+(ok?r:'')+'</div>'});
+  d.innerHTML='<summary>'+t('detTitle')+'</summary>'+dh;d.open=open;
 
+  /* boutons enregistrer */
+  var good=ok&&!c.neg;
+  $$('.qbtn').forEach(function(b){b.disabled=!good});
+  var rp=$('#btnRepart');if(rp)rp.disabled=!good}
+
+/* ---------- trimestres + bilan annuel ---------- */
+function yearList(){var cy=new Date().getFullYear(),ys=[cy-2,cy-1,cy,cy+1];if(ys.indexOf(S.year)<0){ys.push(S.year);ys.sort()}return ys}
+function qSummary(pg,r){return pg==='energie'?t('recLineE',nf(r.c.kwh,0),nf(r.c.gm3,1),nf(r.tot)):t('recLineW',nf(r.c.m3,1),nf(r.tot))}
+
+function renderQ(){
+  var pg=S.tab,y=S.year,R=recs(pg,y),sug=Math.ceil((new Date(S.dates[pg].cur+'T12:00:00').getMonth()+1)/3),msg=($('#saveMsg')||{}).textContent||'';
+  var yopts=yearList().map(function(v){return '<option value="'+v+'"'+(v===y?' selected':'')+'>'+v+'</option>'}).join('');
+  var qb=[1,2,3,4].map(function(n){var r=R[n-1];
+    return '<button type="button" class="qbtn'+(r?' done':'')+(n===sug?' sug':'')+'" data-q="'+n+'"><b>'+t('saveWord')+'</b><span class="qn">'+t('q'+n)+'</span><small>'+(r?t('qSaved',nf(r.tot,0)):t('qEmpty')+(n===sug?' · '+t('qSug'):''))+'</small></button>'}).join('');
+  $('#saveCard').innerHTML='<h2>'+t('saveTitle')+'</h2><p class="sub">'+t(pg==='eau'?'saveHelpW':'saveHelpE')+'</p>'+
+    '<label class="fld yrow"><span>'+t('yearLbl')+'</span><select id="yearSel">'+yopts+'</select></label><div class="qgrid">'+qb+'</div>'+
+    '<p class="hint" id="saveMsg" role="status" style="margin-top:10px">'+esc(msg)+'</p>'+
+    '<div class="ro-actions" style="margin-top:6px"><button type="button" class="btn" id="btnRepart">'+t('repart')+'</button></div>';
+  $('#yearSel').addEventListener('change',function(){S.year=Number(this.value);save();renderQ();recompute()});
+
+  var li=R.map(function(r,k){var n=k+1;
+    if(!r)return '<li><div class="h-main"><b>'+t('q'+n)+'</b><small>'+t('qEmpty')+'</small></div></li>';
+    return '<li><div class="h-main"><b>'+t('q'+n)+'</b><small>'+qSummary(pg,r)+'</small><small>'+fdate(r.d0)+' → '+fdate(r.d1)+'</small></div><div class="h-act"><button type="button" class="mini" data-load="'+n+'">'+t('recLoad')+'</button><button type="button" class="mini" data-delq="'+n+'">'+t('recDel')+'</button></div></li>'}).join('');
+  var have=R.filter(Boolean).length,miss=[1,2,3,4].filter(function(n){return !R[n-1]}).map(function(n){return t('q'+n)}).join(', ');
+  var key=pg+y;if(have<4)delete anOpen[key];
+  $('#recCard').innerHTML='<h2>'+t('recTitle',y)+'</h2><ul class="hist" style="margin-top:8px">'+li+'</ul>'+
+    '<div class="ro-actions" style="margin-top:14px"><button type="button" class="btn primary" id="btnAnnual"'+(have<4?' disabled':'')+'>'+t('anBtn')+'</button></div>'+
+    '<p class="hint an-msg">'+(have<4?t('anMissing',miss):t('anReady'))+'</p><div id="anOut">'+(anOpen[key]&&have===4?annualHTML(pg,y,R):'')+'</div>'}
+
+function annualHTML(pg,y,R){
+  var da=t('da'),S0={tot:0,cash:0,kwh:0,gm3:0,gth:0,m3:0,totE:0,totG:0},max=0,maxN=1;
+  R.forEach(function(r,k){S0.tot+=r.tot;S0.cash+=r.tot+r.stamp;if(r.tot>max){max=r.tot;maxN=k+1}
+    if(pg==='energie'){S0.kwh+=r.c.kwh;S0.gm3+=r.c.gm3;S0.gth+=r.c.gth;S0.totE+=r.totE;S0.totG+=r.totG}else S0.m3+=r.c.m3});
+  var tiles=pg==='energie'?
+    '<div class="stat" style="--accent:var(--elec)"><span>'+t('anElec')+'</span><b>'+nf(S0.kwh,0)+' kWh</b><small>'+t('anElecCost',nf(S0.totE))+'</small></div>'+
+    '<div class="stat" style="--accent:var(--gaz)"><span>'+t('anGaz')+'</span><b>'+nf(S0.gm3,1)+' m³</b><small>'+t('anThIs',nf(S0.gth,0))+' · '+t('anGazCost',nf(S0.totG))+'</small></div>':
+    '<div class="stat"><span>'+t('anEau')+'</span><b>'+nf(S0.m3,1)+' m³</b></div>';
+  var bars=R.map(function(r,k){return '<div class="bar"><span>'+t('q'+(k+1))+'</span><div class="tk"><i style="width:'+(max?Math.max(2,r.tot/max*100):0)+'%"></i></div><b>'+nf(r.tot,0)+' '+da+'</b></div>'}).join('');
+  return '<h3 class="sech">'+t('anTitle',y)+'</h3><div class="stats">'+tiles+'<div class="stat"><span>'+t('anCost')+'</span><b>'+nf(S0.tot)+' '+da+'</b><small>'+t('anCash',nf(S0.cash))+'</small></div></div>'+
+    '<p class="hint" style="margin-top:10px">'+t('anAvg',nf(S0.tot/4))+' · '+t('anMax',t('q'+maxN))+'</p><p class="hint" style="margin-top:12px;font-weight:600">'+t('anBars')+'</p><div class="bars">'+bars+'</div>'}
+
+function flashQ(m){var el=$('#saveMsg');if(el){el.textContent=m;clearTimeout(flashQ._t);flashQ._t=setTimeout(function(){var e=$('#saveMsg');if(e)e.textContent=''},3000)}}
+
+/* ---------- réglage sur la vraie facture ---------- */
 function renderCal(){
-  var u=S.tab,st=S.u[u],el=$('#calCard');var open=el.open;
-  el.innerHTML='<summary>'+t('calTitle')+'</summary><div class="body"><p class="hint">'+t('calHelp')+'</p><div class="pgrid"><label class="fld"><span>'+t('calCons',BU[u])+'</span><input id="cal-cons" inputmode="decimal"></label><label class="fld"><span>'+t('calPaid')+'</span><input id="cal-paid" inputmode="decimal"></label></div><div class="ro-actions" style="margin:0"><button type="button" class="btn primary" id="cal-go">'+t('calApply')+'</button>'+(st.cal?'<button type="button" class="btn" id="cal-clear">'+t('calClear')+'</button>':'')+'</div><p class="hint" id="cal-msg">'+(st.cal?t('calOn',nf(st.cal.f,3)):'')+'</p></div>';
+  var pg=S.tab,el=$('#calCard'),open=el.open,cal=S.cal[pg];
+  var fields=pg==='energie'?
+    '<label class="fld"><span>'+t('calConsE')+'</span><input id="cal-c1" inputmode="decimal"></label><label class="fld"><span>'+t('calConsG')+'</span><input id="cal-c2" inputmode="decimal"></label><label class="fld"><span>'+t('calPaid')+'</span><input id="cal-paid" inputmode="decimal"></label>':
+    '<label class="fld"><span>'+t('calCons','m³')+'</span><input id="cal-c1" inputmode="decimal"></label><label class="fld"><span>'+t('calPaid')+'</span><input id="cal-paid" inputmode="decimal"></label>';
+  el.innerHTML='<summary>'+t('calTitle')+'</summary><div class="body"><p class="hint">'+t(pg==='energie'?'calHelpE':'calHelp')+'</p><div class="pgrid">'+fields+'</div><div class="ro-actions" style="margin:0"><button type="button" class="btn primary" id="cal-go">'+t('calApply')+'</button>'+(cal?'<button type="button" class="btn" id="cal-clear">'+t('calClear')+'</button>':'')+'</div><p class="hint" id="cal-msg">'+(cal?t('calOn',nf(cal.f,3)):'')+'</p></div>';
   el.open=open}
 
+/* ---------- barème ---------- */
 function renderBar(){
-  var u=S.tab,U=P(u),el=$('#barCard'),open=el.open,bu=BU[u];
-  var g='<span class="hd"></span><span class="hd">'+t('bUpTo')+'</span><span class="hd">'+t('bPrice',bu)+'</span><span class="hd">'+t('bTva')+'</span>';
-  U.tr.forEach(function(tr,i){g+='<span class="tn">'+t('bTr',i+1)+'</span><input id="b-lim-'+i+'" inputmode="decimal" value="'+(tr.lim==null?'':tr.lim)+'" '+(tr.lim==null?'disabled placeholder="'+t('bLast')+'"':'')+'><input id="b-price-'+i+'" inputmode="decimal" value="'+tr.price+'"><input id="b-tva-'+i+'" inputmode="decimal" value="'+tr.tva+'">'});
-  var spec={elec:[['fixed','power','bPower'],['fixed','perKwMonth','bPerKw'],['fixed','tvaFixed','bTvaFixed'],['th',null,'bTH'],['other',null,'bOther']],
-            gaz:[['coef',null,'bCoef'],['fixed','perMonth','bPerMonth'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
-            eau:[['fixed','perMonth','bFixeEau'],['fixed','tvaFixed','bTvaFixed'],['sanit',null,'bSanit'],['other',null,'bOther']]}[u];
-  var pg=spec.map(function(sp,k){var v=sp[1]?U[sp[0]][sp[1]]:U[sp[0]];return '<label class="fld"><span>'+t(sp[2])+'</span><input id="b-p-'+k+'" inputmode="decimal" value="'+v+'"></label>'}).join('');
-  el.innerHTML='<summary>'+t('bTitle')+'</summary><div class="body"><p class="hint">'+t('bNote')+'</p><div class="tr-grid">'+g+'</div><div class="pgrid">'+pg+'</div><div><button type="button" class="btn" id="b-reset">'+t('bReset')+'</button></div></div>';
-  el.open=open;
-  U.tr.forEach(function(tr,i){
-    ['lim','price','tva'].forEach(function(f){var inp=$('#b-'+f+'-'+i);if(!inp||inp.disabled)return;
+  var pg=S.tab,el=$('#barCard'),open=el.open,h='';
+  PU[pg].forEach(function(u){var U=P(u),bu=BU[u];
+    var g='<span class="hd"></span><span class="hd">'+t('bUpTo')+'</span><span class="hd">'+t('bPrice',bu)+'</span><span class="hd">'+t('bTva')+'</span>';
+    U.tr.forEach(function(tr,i){g+='<span class="tn">'+t('bTr',i+1)+'</span><input id="b-'+u+'-lim-'+i+'" inputmode="decimal" value="'+(tr.lim==null?'':tr.lim)+'" '+(tr.lim==null?'disabled placeholder="'+t('bLast')+'"':'')+'><input id="b-'+u+'-price-'+i+'" inputmode="decimal" value="'+tr.price+'"><input id="b-'+u+'-tva-'+i+'" inputmode="decimal" value="'+tr.tva+'">'});
+    var spec=SPEC[u],pgd=spec.map(function(sp,k){var v=sp[1]?U[sp[0]][sp[1]]:U[sp[0]];return '<label class="fld"><span>'+t(sp[2])+'</span><input id="b-'+u+'-p-'+k+'" inputmode="decimal" value="'+v+'"></label>'}).join('');
+    h+='<h3 class="sech" style="margin-top:'+(h?14:0)+'px;'+(h?'':'border:0;padding:0;')+'">'+t('b_'+u)+'</h3><div class="tr-grid">'+g+'</div><div class="pgrid">'+pgd+'</div><div><button type="button" class="btn" data-breset="'+u+'">'+t('bReset')+'</button></div>'});
+  el.innerHTML='<summary>'+t('bTitle')+'</summary><div class="body"><p class="hint">'+t('bNote')+'</p>'+h+'</div>';el.open=open;
+  PU[pg].forEach(function(u){var U=P(u);
+    U.tr.forEach(function(tr,i){['lim','price','tva'].forEach(function(f){var inp=$('#b-'+u+'-'+f+'-'+i);if(!inp||inp.disabled)return;
       inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;editP(u).tr[i][f]=v;touch();recompute();save()})})});
-  spec.forEach(function(sp,k){var inp=$('#b-p-'+k);inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;var p=editP(u);if(sp[1])p[sp[0]][sp[1]]=v;else p[sp[0]]=v;touch();recompute();save()})});
-  $('#b-reset').addEventListener('click',function(){S.u[u].p=null;renderBar();recompute();save()})}
+    SPEC[u].forEach(function(sp,k){var inp=$('#b-'+u+'-p-'+k);inp.addEventListener('input',function(){var v=num(inp.value);if(!isFinite(v)||v<0)return;var p=editP(u);if(sp[1])p[sp[0]][sp[1]]=v;else p[sp[0]]=v;touch();recompute();save()})})})}
+var SPEC={elec:[['fixed','power','bPower'],['fixed','perKwMonth','bPerKw'],['fixed','tvaFixed','bTvaFixed'],['th',null,'bTH'],['other',null,'bOther']],
+  gaz:[['coef',null,'bCoef'],['fixed','perMonth','bPerMonth'],['fixed','tvaFixed','bTvaFixed'],['other',null,'bOther']],
+  eau:[['fixed','perMonth','bFixeEau'],['fixed','tvaFixed','bTvaFixed'],['sanit',null,'bSanit'],['other',null,'bOther']]};
 
 function renderSrc(){
   var L=[['https://creg.gov.dz/wp-content/uploads/2021/11/D-06-05-FR.pdf','s_creg'],
@@ -611,35 +796,86 @@ function renderSrc(){
    ['https://www.iwra.org/congress/2008/resource/authors/abs412_article.pdf','s_iwra']];
   $('#srcCard').innerHTML='<h2>'+t('srcTitle')+'</h2><ul class="src" style="margin-top:10px">'+L.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener noreferrer">'+t(x[1])+'</a></li>'}).join('')+'</ul>'}
 
-function renderAll(){renderStatic();renderPlates();renderCal();renderBar();renderHist();renderSrc();recompute()}
+/* ---------- rappels de facture ---------- */
+function lastBill(pg){var l=S.alert.last[pg];if(l)return l;var best='',Y=S.q[pg];
+  Object.keys(Y).forEach(function(y){Object.keys(Y[y]).forEach(function(n){var r=Y[y][n];if(r&&r.d1>best)best=r.d1})});return best}
+function nextExp(pg){var b=lastBill(pg);if(!b)return null;var e=addMonths(b,3),td=today();while(daysBetween(e,td)>3)e=addMonths(e,3);return e}
+function alertInfo(pg){var e=nextExp(pg);if(!e)return null;
+  var ws=addDays(e,-3),we=addDays(e,3),td=today(),toStart=daysBetween(td,ws),st=td>=ws?'now':(toStart<=S.alert.lead?'soon':'later');
+  return {e:e,ws:ws,we:we,state:st}}
+function alertMsg(pg,a){return t(a.state==='now'?'alNow':'alSoon',pgName(pg,true),fdate(a.ws),fdate(a.we))}
 
-function flash(msg){var f=$('#flash');f.textContent=msg;clearTimeout(flash._t);flash._t=setTimeout(function(){f.textContent=''},2400)}
+function renderAlertBanner(){
+  var h='';PAGES.forEach(function(pg){var a=alertInfo(pg);if(a&&a.state!=='later')h+='<div class="alert">'+BELL+'<span>'+esc(alertMsg(pg,a))+'</span></div>'});
+  $('#alerts').innerHTML=h}
 
-/* ---------- events ---------- */
+function notifyDue(){
+  if(!S.alert.notif||!('Notification' in window)||Notification.permission!=='granted')return;
+  PAGES.forEach(function(pg){var a=alertInfo(pg);if(!a||a.state==='later')return;var key=pg+a.e+a.state;if(S.alert.sent[key])return;
+    S.alert.sent[key]=1;save();var body=alertMsg(pg,a),title=t('alTitle');
+    try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(function(reg){reg.showNotification(title,{body:body,icon:'icon-192.png',badge:'icon-192.png',tag:'kaddach-'+pg})}).catch(function(){new Notification(title,{body:body})})}else new Notification(title,{body:body})}catch(e){}})}
+
+function renderAlertCard(){
+  var perm=('Notification' in window)?Notification.permission:'na';
+  var blocks=PAGES.map(function(pg){var a=alertInfo(pg),last=S.alert.last[pg]||'';
+    return '<div class="rem"><label class="fld"><span>'+t('alLast',pgName(pg))+'</span><input type="date" data-last="'+pg+'" value="'+last+'"></label><p>'+(a?esc(t('alNext',fdate(a.ws),fdate(a.we))):t('alNone'))+'</p></div>'}).join('');
+  var leads=[5,7,10,14].map(function(n){return '<option value="'+n+'"'+(n===S.alert.lead?' selected':'')+'>'+t('alDays',n)+'</option>'}).join('');
+  var nb=perm==='na'?'<span class="hint">'+t('alNotifNA')+'</span>':perm==='denied'?'<span class="hint">'+t('alNotifNo')+'</span>':(S.alert.notif&&perm==='granted'?'<span class="hint">'+t('alNotifOn')+'</span>':'<button type="button" class="btn" id="btnNotif">'+BELL+'<span>'+t('alNotif')+'</span></button>');
+  $('#alertCard').innerHTML='<h2>'+t('alTitle')+'</h2><p class="sub">'+t('alHelp')+'</p>'+blocks+
+    '<label class="fld" style="max-width:220px;margin-top:6px"><span>'+t('alLead')+'</span><select id="alLead">'+leads+'</select></label>'+
+    '<div class="ro-actions" style="margin-top:12px">'+nb+'<button type="button" class="btn primary" id="btnIcs">'+t('alIcs')+'</button></div><p class="hint" id="alMsg" role="status" style="margin-top:8px"></p><p class="hint" style="margin-top:6px">'+t('alNote')+'</p>';
+  $$('[data-last]').forEach(function(inp){inp.addEventListener('change',function(){S.alert.last[inp.dataset.last]=inp.value||'';save();renderAlertBanner();renderAlertCard();notifyDue()})});
+  $('#alLead').addEventListener('change',function(){S.alert.lead=Number(this.value);save();renderAlertBanner();renderAlertCard();notifyDue()})}
+
+function buildICS(){
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kaddach Fatoura//FR','CALSCALE:GREGORIAN'],n=0,z=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  PAGES.forEach(function(pg){var a=alertInfo(pg);if(!a)return;n++;
+    var ev=a.e,st=addDays(a.ws,-S.alert.lead),en=addDays(a.we,1),nm=t('icsTitle',pgName(pg,true));
+    L.push('BEGIN:VEVENT','UID:kaddach-'+pg+'-'+ev+'@kaddach-fatoura','DTSTAMP:'+z,'DTSTART;VALUE=DATE:'+st.replace(/-/g,''),'DTEND;VALUE=DATE:'+en.replace(/-/g,''),'RRULE:FREQ=MONTHLY;INTERVAL=3',
+      'SUMMARY:'+nm,'DESCRIPTION:'+t('icsDesc'),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+nm,'TRIGGER:PT9H','END:VALARM','END:VEVENT')});
+  L.push('END:VCALENDAR');return n?L.join('\r\n'):''}
+
+function renderAll(){renderStatic();renderIdx();renderQ();renderCal();renderBar();renderSrc();renderAlertBanner();renderAlertCard();recompute()}
+
+/* ---------- événements ---------- */
 document.addEventListener('click',function(e){
   var tg=e.target.closest?e.target.closest('button,[data-lang]'):null;if(!tg)return;
-  var u=S.tab,st=S.u[u];
+  var pg=S.tab,D=S.dates[pg],us=PU[pg];
   if(tg.dataset.lang){S.lang=tg.dataset.lang;save();renderAll();return}
-  if(tg.classList.contains('tab')){S.tab=tg.dataset.u;save();renderAll();return}
-  if(tg.id==='demoBtn'){UTILS.forEach(function(k){var x=S.u[k];x.start.idx=0;x.cur.idx=0;x.start.date=addDays(x.cur.date,-61)});S.demo=false;save();renderAll();return}
-  if(tg.id==='btnSave'){var h=st.hist;if(!h.some(function(x){return x.date===st.cur.date&&x.idx===st.cur.idx}))h.push({id:String(Date.now()),date:st.cur.date,idx:st.cur.idx,photo:st.photo.cur});if(h.length>12)h.shift();touch();save();renderHist();flash(t('saved'));return}
-  if(tg.id==='btnNew'){var a=st.cur;if(!st.hist.some(function(x){return x.date===a.date&&x.idx===a.idx}))st.hist.push({id:String(Date.now()),date:a.date,idx:a.idx,photo:st.photo.cur});
-    st.start={idx:a.idx,date:a.date};st.photo.start=st.photo.cur;st.photo.cur=null;touch();save();renderPlates();renderHist();recompute();flash(t('newDone'));return}
-  if(tg.dataset.use){var en=st.hist.filter(function(x){return x.id===tg.dataset.use})[0];if(en){st.start={idx:en.idx,date:en.date};st.photo.start=en.photo||null;touch();save();renderPlates();recompute()}return}
-  if(tg.dataset.del){st.hist=st.hist.filter(function(x){return x.id!==tg.dataset.del});save();renderHist();return}
-  if(tg.dataset.unphoto){st.photo[tg.dataset.unphoto]=null;renderThumb(tg.dataset.unphoto);save();return}
-  if(tg.dataset.zoom){var src=st.photo[tg.dataset.zoom];if(src){var lb=document.createElement('div');lb.className='lightbox';lb.innerHTML='<img alt="" src="'+src+'">';lb.addEventListener('click',function(){lb.remove()});document.body.appendChild(lb)}return}
-  if(tg.id==='cal-go'){var c=num($('#cal-cons').value),p=num($('#cal-paid').value),msg=$('#cal-msg');
-    if(!(c>0&&p>0)){msg.textContent=t('calErr');return}
-    var est=bill(u,P(u),c).total,f=p/est;st.cal={f:f,on:true};save();recompute();
+  if(tg.classList.contains('tab')){S.tab=tg.dataset.pg;save();renderAll();return}
+  if(tg.id==='demoBtn'){UTILS.forEach(function(k){var x=S.u[k];x.start.idx=0;x.cur.idx=0});PAGES.forEach(function(p){S.dates[p].start=addDays(S.dates[p].cur,-61)});S.demo=false;save();renderAll();return}
+  if(tg.dataset.q){var n=Number(tg.dataset.q),y=S.year,c=calcPage(pg);
+    if(!c.ok||c.neg){flashQ(t('saveErr'));return}
+    if(!S.q[pg][y])S.q[pg][y]={};var had=!!S.q[pg][y][n];S.q[pg][y][n]=makeRecord(pg);touch();save();
+    var m=t(had?'updQ':'savedQ',t('q'+n),y);renderQ();recompute();flashQ(m);return}
+  if(tg.id==='btnRepart'){us.forEach(function(u){var st=S.u[u];st.start={idx:st.cur.idx};st.photo.start=st.photo.cur;st.photo.cur=null});D.start=D.cur;touch();save();renderIdx();recompute();flashQ(t('repartDone'));return}
+  if(tg.dataset.load){var r=(S.q[pg][S.year]||{})[tg.dataset.load];if(r){
+    if(pg==='energie'){S.u.elec.start.idx=r.i.e0;S.u.elec.cur.idx=r.i.e1;S.u.gaz.start.idx=r.i.g0;S.u.gaz.cur.idx=r.i.g1}else{S.u.eau.start.idx=r.i.w0;S.u.eau.cur.idx=r.i.w1}
+    D.start=r.d0;D.cur=r.d1;touch();save();renderIdx();recompute();window.scrollTo({top:0,behavior:'smooth'})}return}
+  if(tg.dataset.delq){if(window.confirm(t('recDelAsk'))){var Y=S.q[pg][S.year];if(Y)delete Y[tg.dataset.delq];save();renderQ();recompute()}return}
+  if(tg.id==='btnAnnual'){anOpen[pg+S.year]=true;renderQ();var o=$('#anOut');if(o&&o.scrollIntoView)o.scrollIntoView({behavior:'smooth',block:'nearest'});return}
+  if(tg.id==='btnNotif'){if(!('Notification' in window))return;Notification.requestPermission().then(function(p){S.alert.notif=p==='granted';save();renderAlertCard();notifyDue()});return}
+  if(tg.id==='btnIcs'){var txt=buildICS(),m2=$('#alMsg');
+    if(!txt){m2.textContent=t('alIcsNone');return}
+    try{var b=new Blob([txt],{type:'text/calendar'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kaddach-rappels.ics';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}catch(x){}return}
+  if(tg.dataset.unphoto){var pr=tg.dataset.unphoto.split(':');S.u[pr[0]].photo[pr[1]]=null;renderThumb(pr[0],pr[1]);save();return}
+  if(tg.dataset.zoom){var z=tg.dataset.zoom.split(':'),src=S.u[z[0]].photo[z[1]];if(src){var lb=document.createElement('div');lb.className='lightbox';lb.innerHTML='<img alt="" src="'+src+'">';lb.addEventListener('click',function(){lb.remove()});document.body.appendChild(lb)}return}
+  if(tg.dataset.breset){S.u[tg.dataset.breset].p=null;renderBar();recompute();save();return}
+  if(tg.id==='cal-go'){var a1=num($('#cal-c1').value),pd=num($('#cal-paid').value),msg=$('#cal-msg'),est,okc;
+    if(pg==='energie'){var a2=num($('#cal-c2').value);okc=a1>0&&a2>=0&&pd>0&&isFinite(a2);
+      if(okc)est=combine(bill('elec',P('elec'),a1),bill('gaz',P('gaz'),a2*P('gaz').coef)).total}
+    else{okc=a1>0&&pd>0;if(okc)est=bill('eau',P('eau'),a1).total}
+    if(!okc||!(est>0)){msg.textContent=t('calErr');return}
+    var f=pd/est;S.cal[pg]={f:f,on:true};save();recompute();
     var pc=Math.abs(f-1)*100;msg.textContent=t('calRes',nf(pc,1),f>=1?t('calHigh'):t('calLow'));
-    if(!$('#cal-clear')){var b=document.createElement('button');b.type='button';b.className='btn';b.id='cal-clear';b.textContent=t('calClear');tg.parentNode.appendChild(b)}return}
-  if(tg.id==='cal-clear'){st.cal=null;save();renderCal();recompute();return}
+    if(!$('#cal-clear')){var bb=document.createElement('button');bb.type='button';bb.className='btn';bb.id='cal-clear';bb.textContent=t('calClear');tg.parentNode.appendChild(bb)}return}
+  if(tg.id==='cal-clear'){S.cal[pg]=null;save();renderCal();recompute();return}
 });
 
-/* ---------- boot ---------- */
+/* ---------- démarrage ---------- */
 odo=Odo($('#odo'),6);
 renderAll();
+notifyDue();
 })();
 </script>
 
