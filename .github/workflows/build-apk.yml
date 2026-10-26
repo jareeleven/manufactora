@@ -1,0 +1,50 @@
+name: Construire l'APK Android
+
+on:
+  workflow_dispatch:        # bouton « Run workflow » dans l'onglet Actions
+  push:
+    branches: [main, master]
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Installer Capacitor
+        run: npm install
+
+      - name: Créer le projet Android
+        run: npx cap add android
+
+      - name: Icône de l'application
+        run: |
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          cp -r android-icons/* android/app/src/main/res/
+
+      - name: Autoriser l'appareil photo (photo du compteur)
+        run: sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
+
+      - name: Copier l'application dans le projet
+        run: npx cap sync android
+
+      - name: Construire l'APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kaddach-fatoura-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
