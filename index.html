@@ -211,6 +211,7 @@ details.card>.body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .plate-title svg{width:22px;height:22px;fill:var(--accent);vertical-align:-3px;margin-inline-end:4px}
 .plate h3,.card h3.sech{font-family:'Big Shoulders Display','Cairo',sans-serif;font-weight:800;font-size:17px;letter-spacing:.04em;text-transform:uppercase;margin:0}
 .card h3.sech{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.usec+.usec{margin-top:20px;padding-top:18px;border-top:2px dashed var(--line)}
 .idxpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:18px;--dw:28px;--dh:44px}
 @media (max-width:540px){.idxpair{--dw:clamp(30px,10vw,40px);--dh:clamp(46px,14vw,58px)}}
 .idxcol{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -411,7 +412,7 @@ Object.assign(I.ar,{demo:'هذه قيم تجريبية (فاتورة سونلغ�
 /* ---- v3 texts ---- */
 Object.assign(I.fr,{
  tag:"Ajoute tes index, vois ta facture avant qu'elle arrive, et garde tes 4 trimestres.",
- tab_energie:'Électricité + Gaz',
+ tab_energie:'Électricité & Gaz',
  dTitle:'Dates de relevé',dHintE:"Une seule facture couvre l'électricité et le gaz : mêmes dates pour les deux.",dHintW:'Dates de relevé de ton compteur d\'eau.',dStart:"Date de l'ancien relevé",dCur:'Date du nouveau relevé',
  roLabelE:'Consommation électricité et gaz',roLabelW:"Consommation d'eau",roPill:'Estimation trimestre',
  lnElec:'Électricité',lnGaz:'Gaz',lnEau:'Eau',qtyDays:'{0} · {1} jours',
@@ -421,7 +422,7 @@ Object.assign(I.fr,{
  savedQ:'{0} {1} enregistré',updQ:'{0} {1} mis à jour',saveErr:"Impossible d'enregistrer : vérifie les index et les dates.",
  repart:'Repartir de ces index (nouveau trimestre)',repartDone:'Nouveau point de départ enregistré',
  recTitle:'Mes trimestres {0}',recLoad:'Charger',recDel:'Supprimer',recDelAsk:'Supprimer ce trimestre ?',recLineE:'{0} kWh · gaz {1} m³ · {2} DA',recLineW:'{0} m³ · {1} DA',
- anBtn:"Calculer la consommation annuelle",anMissing:'Il manque : {0}',anReady:'Les 4 trimestres sont renseignés.',anTitle:'Bilan {0}',
+ anBtn:"Consommation annuelle",anNone:'Aucun trimestre enregistré pour cette année.',anPartial:'Total partiel : {0} trimestre(s) sur 4.',anMissing:'Il manque : {0}',anReady:'Les 4 trimestres sont renseignés.',anTitle:'Bilan {0}',
  anElec:"Électricité de l'année",anGaz:"Gaz de l'année",anEau:"Eau de l'année",anCost:'Total TTC de l\'année',anCash:'Avec timbres (espèces) : {0} DA',anAvg:'Moyenne par trimestre : {0} DA',anMax:'Trimestre le plus cher : {0}',anBars:'Montant par trimestre',
  anThIs:'≈ {0} th',anElecCost:'Électricité : {0} DA',anGazCost:'Gaz : {0} DA',
  cbTitleE:'Facture Sonelgaz : électricité + gaz',cbTitleW:"Facture d'eau",cbCalRow:'Réglage sur ta facture (× {0})',
@@ -451,7 +452,7 @@ Object.assign(I.ar,{
  savedQ:'تم تسجيل {0} {1}',updQ:'تم تحديث {0} {1}',saveErr:'تعذّر التسجيل: تحقّق من المؤشرات والتواريخ.',
  repart:'ابدأ من هذه المؤشرات (ثلاثي جديد)',repartDone:'تم تسجيل نقطة البداية الجديدة',
  recTitle:'ثلاثياتي {0}',recLoad:'تحميل',recDel:'حذف',recDelAsk:'حذف هذا الثلاثي؟',recLineE:'{0} كيلواط ساعي · غاز {1} م³ · {2} دج',recLineW:'{0} م³ · {1} دج',
- anBtn:'احسب الاستهلاك السنوي',anMissing:'ينقص: {0}',anReady:'الثلاثيات الأربعة مكتملة.',anTitle:'حصيلة {0}',
+ anBtn:'الاستهلاك السنوي',anNone:'لا يوجد أي ثلاثي مسجّل لهذه السنة.',anPartial:'مجموع جزئي: {0} ثلاثي(ات) من 4.',anMissing:'ينقص: {0}',anReady:'الثلاثيات الأربعة مكتملة.',anTitle:'حصيلة {0}',
  anElec:'كهرباء السنة',anGaz:'غاز السنة',anEau:'ماء السنة',anCost:'المجموع السنوي بجميع الرسوم',anCash:'مع الطوابع (نقدا): {0} دج',anAvg:'المعدّل في الثلاثي: {0} دج',anMax:'الثلاثي الأغلى: {0}',anBars:'المبلغ في كل ثلاثي',
  anThIs:'≈ {0} ث',anElecCost:'الكهرباء: {0} دج',anGazCost:'الغاز: {0} دج',
  cbTitleE:'فاتورة سونلغاز: كهرباء + غاز',cbTitleW:'فاتورة الماء',cbCalRow:'الضبط على فاتورتك (× {0})',
@@ -618,7 +619,7 @@ function blockHTML(u){
     return '<div class="idxcol"><h3>'+t(which==='start'?'pStart':'pCur')+'</h3><p class="plate-hint">'+t(which==='start'?'hStart':'hCur')+'</p><div data-host="'+u+':'+which+'"></div>'+
     '<div class="idrow"><label class="fld"><span>'+t('typeIdx')+' ('+MU[u]+')</span><input id="'+k+'-idx" inputmode="decimal" autocomplete="off"></label><button type="button" class="btn ico" data-photo="'+u+':'+which+'" aria-label="'+t('photo')+'">'+CAM+'</button></div>'+
     '<div id="'+k+'-thumb"></div><input type="file" accept="image/*" capture="environment" hidden id="'+k+'-file"></div>'}
-  return '<article class="plate" data-uu="'+u+'" style="--accent:var(--'+u+')"><div class="plate-head"><h2 class="plate-title">'+ICON[u]+t('b_'+u)+'</h2><span class="tag demo-tag"'+(S.demo?'':' hidden')+'>'+t('example')+'</span></div><div class="idxpair">'+side('start')+side('cur')+'</div><p class="plate-hint" style="margin-top:10px">'+t('drumHelp')+'</p></article>'}
+  return '<div class="usec" data-uu="'+u+'" style="--accent:var(--'+u+')"><div class="plate-head"><h2 class="plate-title">'+ICON[u]+t('b_'+u)+'</h2><span class="tag demo-tag"'+(S.demo?'':' hidden')+'>'+t('example')+'</span></div><div class="idxpair">'+side('start')+side('cur')+'</div><p class="plate-hint" style="margin-top:10px">'+t('drumHelp')+'</p></div>'}
 
 function renderThumb(u,which){
   var host=$('#'+u+'-'+which+'-thumb'),src=S.u[u].photo[which];if(!host)return;
@@ -633,7 +634,7 @@ function renderIdx(){
   $('#d-start').value=D.start;$('#d-cur').value=D.cur;
   ['start','cur'].forEach(function(w){var k=w==='start'?'#d-start':'#d-cur',el=$(k);el.addEventListener('change',function(){if(el.value){D[w]=el.value;touch();recompute();save()}})});
   $$('[data-ago]').forEach(function(b){b.addEventListener('click',function(){D.start=addDays(D.cur,-Number(b.dataset.ago));$('#d-start').value=D.start;touch();recompute();save()})});
-  $('#blocks').innerHTML=us.map(blockHTML).join('');
+  $('#blocks').innerHTML='<article class="plate">'+us.map(blockHTML).join('')+'</article>';
   meters={};
   us.forEach(function(u){var cfg=MET[u];
     ['start','cur'].forEach(function(which){
@@ -736,29 +737,31 @@ function renderQ(){
   $('#saveCard').innerHTML='<h2>'+t('saveTitle')+'</h2><p class="sub">'+t(pg==='eau'?'saveHelpW':'saveHelpE')+'</p>'+
     '<label class="fld yrow"><span>'+t('yearLbl')+'</span><select id="yearSel">'+yopts+'</select></label><div class="qgrid">'+qb+'</div>'+
     '<p class="hint" id="saveMsg" role="status" style="margin-top:10px">'+esc(msg)+'</p>'+
-    '<div class="ro-actions" style="margin-top:6px"><button type="button" class="btn" id="btnRepart">'+t('repart')+'</button></div>';
+    '<div class="ro-actions" style="margin-top:6px"><button type="button" class="btn" id="btnRepart">'+t('repart')+'</button></div>'+
+    '<h3 class="sech">'+t('anTitle',y)+'</h3><div class="ro-actions" style="margin-top:10px"><button type="button" class="btn primary" id="btnAnnual">'+t('anBtn')+'</button></div><div id="anOut" role="status">'+(anOpen[pg+y]?annualHTML(pg,y,R):'')+'</div>';
   $('#yearSel').addEventListener('change',function(){S.year=Number(this.value);save();renderQ();recompute()});
 
   var li=R.map(function(r,k){var n=k+1;
     if(!r)return '<li><div class="h-main"><b>'+t('q'+n)+'</b><small>'+t('qEmpty')+'</small></div></li>';
     return '<li><div class="h-main"><b>'+t('q'+n)+'</b><small>'+qSummary(pg,r)+'</small><small>'+fdate(r.d0)+' → '+fdate(r.d1)+'</small></div><div class="h-act"><button type="button" class="mini" data-load="'+n+'">'+t('recLoad')+'</button><button type="button" class="mini" data-delq="'+n+'">'+t('recDel')+'</button></div></li>'}).join('');
   var have=R.filter(Boolean).length,miss=[1,2,3,4].filter(function(n){return !R[n-1]}).map(function(n){return t('q'+n)}).join(', ');
-  var key=pg+y;if(have<4)delete anOpen[key];
-  $('#recCard').innerHTML='<h2>'+t('recTitle',y)+'</h2><ul class="hist" style="margin-top:8px">'+li+'</ul>'+
-    '<div class="ro-actions" style="margin-top:14px"><button type="button" class="btn primary" id="btnAnnual"'+(have<4?' disabled':'')+'>'+t('anBtn')+'</button></div>'+
-    '<p class="hint an-msg">'+(have<4?t('anMissing',miss):t('anReady'))+'</p><div id="anOut">'+(anOpen[key]&&have===4?annualHTML(pg,y,R):'')+'</div>'}
+    $('#recCard').innerHTML='<h2>'+t('recTitle',y)+'</h2><ul class="hist" style="margin-top:8px">'+li+'</ul>'+
+    ''}
 
-function annualHTML(pg,y,R){
-  var da=t('da'),S0={tot:0,cash:0,kwh:0,gm3:0,gth:0,m3:0,totE:0,totG:0},max=0,maxN=1;
-  R.forEach(function(r,k){S0.tot+=r.tot;S0.cash+=r.tot+r.stamp;if(r.tot>max){max=r.tot;maxN=k+1}
+function annualHTML(pg,y,R0){
+  var R=R0.filter(Boolean),have=R.length,da=t('da');if(!have)return '<p class="hint an-msg">'+t('anNone')+'</p>';
+  var miss=[1,2,3,4].filter(function(n){return !R0[n-1]}).map(function(n){return t('q'+n)}).join(', ');
+  var note=have<4?'<p class="hint an-msg" style="color:var(--warn);font-weight:600">'+t('anPartial',have)+' '+t('anMissing',miss)+'</p>':'<p class="hint an-msg">'+t('anReady')+'</p>';
+  var S0={tot:0,cash:0,kwh:0,gm3:0,gth:0,m3:0,totE:0,totG:0},max=0,maxN=1;
+  R0.forEach(function(r,k){if(!r)return;S0.tot+=r.tot;S0.cash+=r.tot+r.stamp;if(r.tot>max){max=r.tot;maxN=k+1}
     if(pg==='energie'){S0.kwh+=r.c.kwh;S0.gm3+=r.c.gm3;S0.gth+=r.c.gth;S0.totE+=r.totE;S0.totG+=r.totG}else S0.m3+=r.c.m3});
   var tiles=pg==='energie'?
     '<div class="stat" style="--accent:var(--elec)"><span>'+t('anElec')+'</span><b>'+nf(S0.kwh,0)+' kWh</b><small>'+t('anElecCost',nf(S0.totE))+'</small></div>'+
     '<div class="stat" style="--accent:var(--gaz)"><span>'+t('anGaz')+'</span><b>'+nf(S0.gm3,1)+' m³</b><small>'+t('anThIs',nf(S0.gth,0))+' · '+t('anGazCost',nf(S0.totG))+'</small></div>':
     '<div class="stat"><span>'+t('anEau')+'</span><b>'+nf(S0.m3,1)+' m³</b></div>';
-  var bars=R.map(function(r,k){return '<div class="bar"><span>'+t('q'+(k+1))+'</span><div class="tk"><i style="width:'+(max?Math.max(2,r.tot/max*100):0)+'%"></i></div><b>'+nf(r.tot,0)+' '+da+'</b></div>'}).join('');
-  return '<h3 class="sech">'+t('anTitle',y)+'</h3><div class="stats">'+tiles+'<div class="stat"><span>'+t('anCost')+'</span><b>'+nf(S0.tot)+' '+da+'</b><small>'+t('anCash',nf(S0.cash))+'</small></div></div>'+
-    '<p class="hint" style="margin-top:10px">'+t('anAvg',nf(S0.tot/4))+' · '+t('anMax',t('q'+maxN))+'</p><p class="hint" style="margin-top:12px;font-weight:600">'+t('anBars')+'</p><div class="bars">'+bars+'</div>'}
+  var bars=R0.map(function(r,k){if(!r)return '<div class="bar"><span>'+t('q'+(k+1))+'</span><div class="tk"></div><b>—</b></div>';return '<div class="bar"><span>'+t('q'+(k+1))+'</span><div class="tk"><i style="width:'+(max?Math.max(2,r.tot/max*100):0)+'%"></i></div><b>'+nf(r.tot,0)+' '+da+'</b></div>'}).join('');
+  return note+'<div class="stats">'+tiles+'<div class="stat"><span>'+t('anCost')+'</span><b>'+nf(S0.tot)+' '+da+'</b><small>'+t('anCash',nf(S0.cash))+'</small></div></div>'+
+    '<p class="hint" style="margin-top:10px">'+t('anAvg',nf(S0.tot/have))+' · '+t('anMax',t('q'+maxN))+'</p><p class="hint" style="margin-top:12px;font-weight:600">'+t('anBars')+'</p><div class="bars">'+bars+'</div>'}
 
 function flashQ(m){var el=$('#saveMsg');if(el){el.textContent=m;clearTimeout(flashQ._t);flashQ._t=setTimeout(function(){var e=$('#saveMsg');if(e)e.textContent=''},3000)}}
 
@@ -853,7 +856,7 @@ document.addEventListener('click',function(e){
     if(pg==='energie'){S.u.elec.start.idx=r.i.e0;S.u.elec.cur.idx=r.i.e1;S.u.gaz.start.idx=r.i.g0;S.u.gaz.cur.idx=r.i.g1}else{S.u.eau.start.idx=r.i.w0;S.u.eau.cur.idx=r.i.w1}
     D.start=r.d0;D.cur=r.d1;touch();save();renderIdx();recompute();window.scrollTo({top:0,behavior:'smooth'})}return}
   if(tg.dataset.delq){if(window.confirm(t('recDelAsk'))){var Y=S.q[pg][S.year];if(Y)delete Y[tg.dataset.delq];save();renderQ();recompute()}return}
-  if(tg.id==='btnAnnual'){anOpen[pg+S.year]=true;renderQ();var o=$('#anOut');if(o&&o.scrollIntoView)o.scrollIntoView({behavior:'smooth',block:'nearest'});return}
+  if(tg.id==='btnAnnual'){anOpen[pg+S.year]=true;renderQ();recompute();var o=$('#anOut');if(o&&o.scrollIntoView)o.scrollIntoView({behavior:'smooth',block:'nearest'});return}
   if(tg.id==='btnNotif'){if(!('Notification' in window))return;Notification.requestPermission().then(function(p){S.alert.notif=p==='granted';save();renderAlertCard();notifyDue()});return}
   if(tg.id==='btnIcs'){var txt=buildICS(),m2=$('#alMsg');
     if(!txt){m2.textContent=t('alIcsNone');return}
