@@ -5,6 +5,9 @@ on:
   push:
     branches: [main, master]
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-24.04
@@ -44,7 +47,15 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Publier l'APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: kaddach-fatoura-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publier l'APK dans Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk kaddach-fatoura.apk
+          gh release delete apk-latest --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
+          gh release create apk-latest kaddach-fatoura.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Kaddach Fatoura (APK Android)" --notes "Dernière version de l'application. Télécharge kaddach-fatoura.apk puis installe-le sur ton téléphone." --latest
